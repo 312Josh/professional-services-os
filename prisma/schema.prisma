@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime   @default(now())
+  sessions     Session[]
+  activities   Activity[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  adminId   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
+model Lead {
+  id                  String    @id @default(cuid())
+  name                String
+  email               String?
+  phone               String?
+  address             String?
+  source              String?
+  serviceRequested    String?
+  status              String    @default("new")
+  disqualifyReason    String?
+  convertedCustomerId String?   @unique
+  convertedCustomer   Customer? @relation("LeadConvertedCustomer", fields: [convertedCustomerId], references: [id])
+  jobs                Job[]
+  activities          Activity[]
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model Customer {
+  id             String     @id @default(cuid())
+  name           String
+  email          String?
+  phone          String?
+  address        String?
+  leadsConverted Lead[]     @relation("LeadConvertedCustomer")
+  jobs           Job[]
+  invoices       Invoice[]
+  activities     Activity[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model Job {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  serviceDate DateTime?
+  status      String     @default("scheduled")
+  customerId  String
+  leadId      String?
+  customer    Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  lead        Lead?      @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  invoices    Invoice[]
+  activities  Activity[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Invoice {
+  id            String            @id @default(cuid())
+  invoiceNumber String            @unique
+  customerId    String
+  jobId         String?
+  issueDate     DateTime          @default(now())
+  dueDate       DateTime?
+  status        String            @default("draft")
+  notes         String?
+  subtotalCents Int               @default(0)
+  taxCents      Int               @default(0)
+  totalCents    Int               @default(0)
+  paymentLink   String?
+  customer      Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  job           Job?              @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  lineItems     InvoiceLineItem[]
+  activities    Activity[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model InvoiceLineItem {
+  id             String  @id @default(cuid())
+  invoiceId      String
+  description    String
+  quantity       Int
+  unitPriceCents Int
+  lineTotalCents Int
+  invoice        Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+  id         String    @id @default(cuid())
+  type       String
+  message    String
+  adminId    String?
+  leadId     String?
+  customerId String?
+  jobId      String?
+  invoiceId  String?
+  admin      Admin?    @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  lead       Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  job        Job?      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  invoice    Invoice?  @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  createdAt  DateTime  @default(now())
+}
