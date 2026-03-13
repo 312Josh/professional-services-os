@@ -269,14 +269,29 @@ export async function createLeadAction(formData: FormData): Promise<void> {
     throw new Error("Lead name is required.");
   }
 
+  const phone = optionalString(formData, "phone");
+  const email = optionalString(formData, "email");
+  if (!phone && !email) {
+    throw new Error("A phone or email is required to work this lead.");
+  }
+
+  const serviceRequested = optionalString(formData, "serviceRequested");
+  if (!serviceRequested) {
+    throw new Error("Service requested is required.");
+  }
+
+  const preferredContactMethod = optionalString(formData, "preferredContactMethod");
+  const requestUrgency = optionalString(formData, "requestUrgency");
+  const intakeNote = asString(formData, "intakeNote");
+
   const lead = await prisma.lead.create({
     data: {
       name,
-      email: optionalString(formData, "email"),
-      phone: optionalString(formData, "phone"),
+      email,
+      phone,
       address: optionalString(formData, "address"),
-      source: optionalString(formData, "source"),
-      serviceRequested: optionalString(formData, "serviceRequested"),
+      source: optionalString(formData, "source") || appConfig.copy.leadDefaultSource,
+      serviceRequested,
       status: "new"
     }
   });
@@ -287,6 +302,26 @@ export async function createLeadAction(formData: FormData): Promise<void> {
     admin: { connect: { id: admin.id } },
     lead: { connect: { id: lead.id } }
   });
+
+  const intakeDetails: string[] = [];
+  if (requestUrgency) {
+    intakeDetails.push(`Urgency: ${requestUrgency}`);
+  }
+  if (preferredContactMethod) {
+    intakeDetails.push(`Preferred contact: ${preferredContactMethod}`);
+  }
+  if (intakeNote) {
+    intakeDetails.push(`Note: ${intakeNote}`);
+  }
+
+  if (intakeDetails.length > 0) {
+    await recordActivity({
+      type: "note",
+      message: `Intake details: ${intakeDetails.join(" | ")}`,
+      admin: { connect: { id: admin.id } },
+      lead: { connect: { id: lead.id } }
+    });
+  }
 
   revalidateDashboardPaths();
 }

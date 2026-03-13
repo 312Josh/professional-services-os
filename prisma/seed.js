@@ -2,8 +2,8 @@ const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
-const businessName = (process.env.BUSINESS_NAME || "BluePipe Plumbing").trim() || "BluePipe Plumbing";
-const demoAdminEmail = (process.env.DEMO_ADMIN_EMAIL || "admin@plumbing.local").trim() || "admin@plumbing.local";
+const businessName = (process.env.BUSINESS_NAME || "Apex Field Services").trim() || "Apex Field Services";
+const demoAdminEmail = (process.env.DEMO_ADMIN_EMAIL || "owner@fieldops.local").trim() || "owner@fieldops.local";
 const demoAdminPassword = (process.env.DEMO_ADMIN_PASSWORD || "admin123").trim() || "admin123";
 
 function toCents(value) {
@@ -11,6 +11,13 @@ function toCents(value) {
 }
 
 async function main() {
+  const now = new Date();
+  const staleLeadCreatedAt = new Date(now.getTime() - 30 * 60 * 60 * 1000);
+  const responseLateLeadCreatedAt = new Date(now.getTime() - 2 * 60 * 60 * 1000);
+  const freshLeadCreatedAt = new Date(now.getTime() - 8 * 60 * 1000);
+  const followUpLeadCreatedAt = new Date(now.getTime() - 72 * 60 * 60 * 1000);
+  const followUpLeadTouchedAt = new Date(now.getTime() - 54 * 60 * 60 * 1000);
+
   const passwordHash = await bcrypt.hash(demoAdminPassword, 10);
 
   await prisma.activity.deleteMany();
@@ -43,6 +50,8 @@ async function main() {
       source: "Google",
       serviceRequested: "Water heater replacement",
       status: "new",
+      createdAt: staleLeadCreatedAt,
+      updatedAt: staleLeadCreatedAt,
     },
   });
 
@@ -55,6 +64,36 @@ async function main() {
       source: "Referral",
       serviceRequested: "Drain cleaning",
       status: "contacted",
+      createdAt: followUpLeadCreatedAt,
+      updatedAt: followUpLeadTouchedAt,
+    },
+  });
+
+  await prisma.lead.create({
+    data: {
+      name: "Derek Fields",
+      phone: "(555) 200-1104",
+      email: "derek@example.com",
+      address: "88 Cedar Way",
+      source: "Website",
+      serviceRequested: "Panel upgrade estimate",
+      status: "new",
+      createdAt: responseLateLeadCreatedAt,
+      updatedAt: responseLateLeadCreatedAt,
+    },
+  });
+
+  await prisma.lead.create({
+    data: {
+      name: "Evelyn Carter",
+      phone: "(555) 200-1105",
+      email: "evelyn@example.com",
+      address: "17 Willow Ct",
+      source: "LSA",
+      serviceRequested: "No-heat emergency",
+      status: "new",
+      createdAt: freshLeadCreatedAt,
+      updatedAt: freshLeadCreatedAt,
     },
   });
 
