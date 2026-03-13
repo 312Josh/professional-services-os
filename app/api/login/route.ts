@@ -1,17 +1,31 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createSession, verifyPassword } from "@/lib/auth";
+import { createSession, sanitizeRedirectPath, verifyPassword } from "@/lib/auth";
 
-export async function POST(request: Request) {
+function redirectWithinRequest(request: NextRequest, path: string): URL {
+  const url = request.nextUrl.clone();
+  url.pathname = path;
+  url.search = "";
+  return url;
+}
+
+export async function POST(request: NextRequest) {
   const formData = await request.formData();
   const email = (formData.get("email") || "").toString().trim().toLowerCase();
   const password = (formData.get("password") || "").toString();
+  const nextPath = sanitizeRedirectPath((formData.get("next") || "").toString());
 
   const admin = await prisma.admin.findUnique({ where: { email } });
   if (!admin || !(await verifyPassword(password, admin.passwordHash))) {
-    return NextResponse.redirect(new URL("/login?error=Invalid%20credentials", request.url));
+    const loginUrl = redirectWithinRequest(request, "/login");
+    loginUrl.searchParams.set("error", "Invalid credentials");
+    if (nextPath) {
+      loginUrl.searchParams.set("next", nextPath);
+    }
+
+    return NextResponse.redirect(loginUrl, 303);
   }
 
   await createSession(admin.id);
-  return NextResponse.redirect(new URL("/dashboard", request.url));
+  return NextResponse.redirect(redirectWithinRequest(request, nextPath || "/dashboard"), 303);
 }

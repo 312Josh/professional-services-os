@@ -86,6 +86,7 @@ model Invoice {
   subtotalCents Int               @default(0)
   taxCents      Int               @default(0)
   totalCents    Int               @default(0)
+  paymentMethod String?
   paymentLink   String?
   customer      Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
   job           Job?              @relation(fields: [jobId], references: [id], onDelete: SetNull)

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { logoutAction } from "@/lib/actions";
 import { requireAdmin } from "@/lib/auth";
 
 const navItems = [
@@ -26,7 +25,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </Link>
           ))}
         </nav>
-        <form action={logoutAction} style={{ marginTop: "1rem" }}>
+        <form method="post" action="/api/logout" style={{ marginTop: "1rem" }}>
           <button type="submit" className="secondary">
             Log out
           </button>

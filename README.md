@@ -8,8 +8,8 @@ Private plumbing operations app built with Next.js + Prisma + SQLite.
 - Lead statuses: `new`, `contacted`, `converted`, `disqualified`
 - Lead conversion flow to customer records
 - Invoice flow with customer/job references, line items, subtotal/tax/total, and status (`draft`, `sent`, `paid`)
-- Placeholder payment link generation with architecture ready for Stripe integration
-- Mock email workflow with templates for invoice, payment link, and reminders
+- Demo-safe payment options layer with configurable methods (`stripe`, `zelle`, `venmo`, `paypal`) and Stripe as primary by default
+- Mock email workflow with templates for invoice, payment link, and reminders (graceful demo fallback behavior)
 - Activity log for admin actions and notes
 - Seeded demo data and default admin login
 
@@ -20,13 +20,14 @@ Private plumbing operations app built with Next.js + Prisma + SQLite.
 - SQLite
 
 ## Exact Run Steps
-1. `cd /tmp/plumbing-app-cJ5F5c`
-2. `npm install`
-3. `npm run db:push`
-4. `npm run seed`
-5. `npm run dev`
-6. Open `http://localhost:3000`
-7. Login with:
+1. `cd /private/tmp/field-service-prod-1yWo3D/repo`
+2. `cp .env.example .env`
+3. `npm install`
+4. `npm run db:push`
+5. `npm run seed`
+6. `npm run dev`
+7. Open `http://localhost:3000`
+8. Login with:
    - Email: `admin@plumbing.local`
    - Password: `admin123`
 
@@ -37,9 +38,22 @@ Private plumbing operations app built with Next.js + Prisma + SQLite.
 - `npm run db:push` - sync Prisma schema to SQLite
 - `npm run seed` - reset and seed demo data
 
-## Project Path
-`/tmp/plumbing-app-cJ5F5c`
+## Environment
+- `DATABASE_URL`: `file:./dev.db` (resolved relative to `prisma/schema.prisma`, so local DB file is `prisma/dev.db`)
+- `SESSION_COOKIE_NAME`: cookie key for admin session token
+- `SESSION_TTL_HOURS`: positive integer session lifetime in hours (invalid values fall back to `168`)
+- `PAYMENT_METHODS`: comma-separated enabled demo methods (defaults to `stripe,zelle,venmo,paypal`)
+- `PAYMENT_PRIMARY_METHOD`: preferred demo method when none is selected (defaults to `stripe`)
 
 ## Notes
-- Email sending is mock-only currently and logs to server console + activity feed.
-- Payment links are placeholders. Replace with Stripe Checkout/Payment Links integration in `lib/actions.ts` when ready.
+- Email sending is mock-only and logs to server console + activity feed with demo notices.
+- Payment-link generation is demo-safe and method-aware; destinations are realistic mocks and do not create real charges/transfers.
+- Login supports safe internal `next` redirects (`/login?next=/invoices/...`) and rejects external redirect targets.
+- Middleware sends unauthenticated requests for protected routes to `/login?next=...` so users return to their original page after login.
+
+## Production Readiness Checklist
+- Replace SQLite with managed Postgres/MySQL and run migrations through CI/CD.
+- Replace mock email and placeholder payment links with real providers (Resend/SES + Stripe).
+- Add CSRF protection for auth-sensitive form posts.
+- Add automated tests for auth/session expiry, status transitions, and invoice totals.
+- Add rate limiting + structured audit logging for login attempts.

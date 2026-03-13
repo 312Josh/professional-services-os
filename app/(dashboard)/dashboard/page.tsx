@@ -1,4 +1,10 @@
 import Link from "next/link";
+import {
+  DASHBOARD_OPEN_INVOICE_STATUSES,
+  DASHBOARD_OPEN_JOB_STATUSES,
+  getInvoiceStatusLabel,
+  getLeadStatusLabel
+} from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/format";
 
@@ -6,8 +12,8 @@ export default async function DashboardPage() {
   const [leadCount, customerCount, openJobs, openInvoices, recentInvoices, recentLeads] = await Promise.all([
     prisma.lead.count(),
     prisma.customer.count(),
-    prisma.job.count({ where: { status: { in: ["SCHEDULED", "IN_PROGRESS"] } } }),
-    prisma.invoice.count({ where: { status: { in: ["DRAFT", "SENT"] } } }),
+    prisma.job.count({ where: { status: { in: [...DASHBOARD_OPEN_JOB_STATUSES] } } }),
+    prisma.invoice.count({ where: { status: { in: [...DASHBOARD_OPEN_INVOICE_STATUSES] } } }),
     prisma.invoice.findMany({
       include: { customer: true },
       orderBy: { createdAt: "desc" },
@@ -69,7 +75,7 @@ export default async function DashboardPage() {
                       <Link href={`/invoices/${invoice.id}`}>{invoice.invoiceNumber}</Link>
                     </td>
                     <td>{invoice.customer.name}</td>
-                    <td>{invoice.status.toLowerCase()}</td>
+                    <td>{getInvoiceStatusLabel(invoice.status)}</td>
                     <td>{formatCurrency(invoice.totalCents)}</td>
                     <td>{formatDate(invoice.createdAt)}</td>
                   </tr>
@@ -95,7 +101,7 @@ export default async function DashboardPage() {
                 {recentLeads.map((lead) => (
                   <tr key={lead.id}>
                     <td>{lead.name}</td>
-                    <td>{lead.status.toLowerCase()}</td>
+                    <td>{getLeadStatusLabel(lead.status)}</td>
                     <td>{lead.serviceRequested || "-"}</td>
                     <td>{formatDate(lead.createdAt)}</td>
                   </tr>

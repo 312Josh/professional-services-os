@@ -1,4 +1,4 @@
-import { getCurrentAdmin } from "@/lib/auth";
+import { getCurrentAdmin, sanitizeRedirectPath } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export default async function LoginPage({
@@ -6,9 +6,10 @@ export default async function LoginPage({
 }: {
   searchParams?: Record<string, string | string[] | undefined>;
 }) {
+  const nextPath = sanitizeRedirectPath(typeof searchParams?.next === "string" ? searchParams.next : null);
   const admin = await getCurrentAdmin();
   if (admin) {
-    redirect("/dashboard");
+    redirect(nextPath || "/dashboard");
   }
 
   const error = typeof searchParams?.error === "string" ? searchParams.error : null;
@@ -20,6 +21,7 @@ export default async function LoginPage({
         <p className="muted">Admin login for the operations dashboard.</p>
         {error ? <p style={{ color: "#b13a3a" }}>{error}</p> : null}
         <form method="post" action="/api/login">
+          {nextPath ? <input type="hidden" name="next" value={nextPath} /> : null}
           <label>
             Email
             <input name="email" type="email" required defaultValue="admin@plumbing.local" />

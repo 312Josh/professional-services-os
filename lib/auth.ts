@@ -5,7 +5,21 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 const COOKIE_NAME = process.env.SESSION_COOKIE_NAME || "plumbing_admin_session";
-const SESSION_TTL_HOURS = Number(process.env.SESSION_TTL_HOURS || "168");
+const parsedSessionTtlHours = Number.parseInt(process.env.SESSION_TTL_HOURS || "168", 10);
+const SESSION_TTL_HOURS = Number.isFinite(parsedSessionTtlHours) && parsedSessionTtlHours > 0 ? parsedSessionTtlHours : 168;
+
+export function sanitizeRedirectPath(rawPath: string | null | undefined): string | null {
+  if (!rawPath) {
+    return null;
+  }
+
+  const candidate = rawPath.trim();
+  if (!candidate || !candidate.startsWith("/") || candidate.startsWith("//")) {
+    return null;
+  }
+
+  return candidate;
+}
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10);
@@ -18,6 +32,10 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 export async function createSession(adminId: string): Promise<void> {
   const token = randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + SESSION_TTL_HOURS * 60 * 60 * 1000);
+
+  await prisma.session.deleteMany({
+    where: { expiresAt: { lt: new Date() } }
+  });
 
   await prisma.session.create({
     data: {

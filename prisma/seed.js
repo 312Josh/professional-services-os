@@ -103,6 +103,7 @@ async function main() {
       subtotalCents,
       taxCents,
       totalCents,
+      paymentMethod: "stripe",
       paymentLink: "https://payments.example.com/pay/inv-demo-1001",
       notes: "Thank you for choosing BluePipe Plumbing.",
       lineItems: {

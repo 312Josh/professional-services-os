@@ -1,5 +1,4 @@
-import { addJobNoteAction, createJobAction, updateJobStatusAction } from "@/lib/actions";
-import { JOB_STATUSES } from "@/lib/constants";
+import { getJobStatusLabel, JOB_SOURCE_LEAD_STATUSES, JOB_STATUSES, JOB_STATUS_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
@@ -10,14 +9,14 @@ export default async function JobsPage() {
       orderBy: { createdAt: "desc" }
     }),
     prisma.customer.findMany({ orderBy: { name: "asc" } }),
-    prisma.lead.findMany({ where: { status: { in: ["NEW", "CONTACTED"] } }, orderBy: { createdAt: "desc" } })
+    prisma.lead.findMany({ where: { status: { in: [...JOB_SOURCE_LEAD_STATUSES] } }, orderBy: { createdAt: "desc" } })
   ]);
 
   return (
     <div className="grid" style={{ gap: "1rem" }}>
       <section className="card">
         <h1>Jobs</h1>
-        <form action={createJobAction} className="grid three">
+        <form method="post" action="/api/jobs" className="grid three">
           <label>
             Title
             <input name="title" required />
@@ -76,16 +75,15 @@ export default async function JobsPage() {
                 <tr key={job.id}>
                   <td>{job.title}</td>
                   <td>{job.customer.name}</td>
-                  <td>{job.status.toLowerCase()}</td>
+                  <td>{getJobStatusLabel(job.status)}</td>
                   <td>{formatDate(job.serviceDate)}</td>
                   <td>
                     <div className="row-actions">
-                      <form action={updateJobStatusAction}>
-                        <input type="hidden" name="jobId" value={job.id} />
-                        <select name="status" defaultValue={job.status}>
+                      <form method="post" action={`/api/jobs/${job.id}/status`}>
+                        <select name="status" defaultValue={job.status.toLowerCase()}>
                           {JOB_STATUSES.map((status) => (
                             <option key={status} value={status}>
-                              {status.toLowerCase()}
+                              {JOB_STATUS_LABELS[status]}
                             </option>
                           ))}
                         </select>
@@ -93,8 +91,7 @@ export default async function JobsPage() {
                           Update
                         </button>
                       </form>
-                      <form action={addJobNoteAction}>
-                        <input type="hidden" name="jobId" value={job.id} />
+                      <form method="post" action={`/api/jobs/${job.id}/notes`}>
                         <input type="hidden" name="customerId" value={job.customerId} />
                         <input name="note" placeholder="Job note" required />
                         <button type="submit">Save Note</button>

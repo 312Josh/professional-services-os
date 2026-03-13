@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getActivityTypeLabel } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
@@ -28,7 +29,7 @@ export default async function ActivityPage() {
             {activities.map((activity) => (
               <tr key={activity.id}>
                 <td>{formatDate(activity.createdAt)}</td>
-                <td>{activity.type.toLowerCase()}</td>
+                <td>{getActivityTypeLabel(activity.type)}</td>
                 <td>{activity.message}</td>
                 <td>
                   <div className="row-actions">

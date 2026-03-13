@@ -1,17 +1,16 @@
-import {
-  addInvoiceNoteAction,
-  generatePaymentLinkAction,
-  sendInvoiceEmailAction,
-  sendPaymentLinkEmailAction,
-  sendReminderEmailAction,
-  updateInvoiceStatusAction
-} from "@/lib/actions";
-import { INVOICE_STATUSES } from "@/lib/constants";
+import { getActivityTypeLabel, getInvoiceStatusLabel, INVOICE_STATUSES, INVOICE_STATUS_LABELS } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { readInvoiceActionNotice } from "@/lib/invoice-action-notice";
+import { getPaymentConfig, getPaymentMethodLabel, resolvePaymentMethod } from "@/lib/payments";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
-export default async function InvoiceDetailPage({ params }: { params: { id: string } }) {
+type InvoiceDetailPageProps = {
+  params: { id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
+
+export default async function InvoiceDetailPage({ params, searchParams }: InvoiceDetailPageProps) {
   const invoice = await prisma.invoice.findUnique({
     where: { id: params.id },
     include: {
@@ -30,15 +29,22 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
     notFound();
   }
 
+  const paymentConfig = getPaymentConfig();
+  const notice = readInvoiceActionNotice(searchParams);
+  const selectedMethod = resolvePaymentMethod(invoice.paymentMethod, paymentConfig);
+  const paymentMethodLabel = getPaymentMethodLabel(invoice.paymentMethod ?? selectedMethod);
+
   return (
     <div className="grid" style={{ gap: "1rem" }}>
+      {notice ? <p className={`notice ${notice.level}`}>{notice.message}</p> : null}
+
       <section className="card">
         <h1>{invoice.invoiceNumber}</h1>
         <p>
           <strong>Customer:</strong> {invoice.customer.name}
         </p>
         <p>
-          <strong>Status:</strong> {invoice.status.toLowerCase()}
+          <strong>Status:</strong> {getInvoiceStatusLabel(invoice.status)}
         </p>
         <p>
           <strong>Issue date:</strong> {formatDate(invoice.issueDate)}
@@ -50,6 +56,9 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
           <strong>Related job:</strong> {invoice.job?.title || "-"}
         </p>
         <p>
+          <strong>Payment method:</strong> {paymentMethodLabel}
+        </p>
+        <p>
           <strong>Payment link:</strong>{" "}
           {invoice.paymentLink ? (
             <a href={invoice.paymentLink} target="_blank" rel="noreferrer">
@@ -58,6 +67,11 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
           ) : (
             "not generated"
           )}
+        </p>
+        <p className="muted">
+          Demo-safe payment mode. Primary method: <strong>{getPaymentMethodLabel(paymentConfig.primaryMethod)}</strong>. Enabled:
+          {" "}
+          {paymentConfig.enabledMethods.map((method) => method.label).join(", ")}.
         </p>
       </section>
 
@@ -98,13 +112,13 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
 
       <section className="card">
         <h2>Invoice Actions</h2>
+        <p className="muted">Invoice and payment emails are intentionally demo/mock actions.</p>
         <div className="row-actions">
-          <form action={updateInvoiceStatusAction}>
-            <input type="hidden" name="invoiceId" value={invoice.id} />
-            <select name="status" defaultValue={invoice.status}>
+          <form method="post" action={`/api/invoices/${invoice.id}/status`}>
+            <select name="status" defaultValue={invoice.status.toLowerCase()}>
               {INVOICE_STATUSES.map((status) => (
                 <option key={status} value={status}>
-                  {status.toLowerCase()}
+                  {INVOICE_STATUS_LABELS[status]}
                 </option>
               ))}
             </select>
@@ -113,27 +127,37 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
             </button>
           </form>
 
-          <form action={generatePaymentLinkAction}>
-            <input type="hidden" name="invoiceId" value={invoice.id} />
+          <form method="post" action={`/api/invoices/${invoice.id}/payment-link`}>
+            <select name="paymentMethod" defaultValue={selectedMethod}>
+              {paymentConfig.enabledMethods.map((method) => (
+                <option key={method.id} value={method.id}>
+                  {method.label}
+                </option>
+              ))}
+            </select>
             <button type="submit">Generate Payment Link</button>
           </form>
 
-          <form action={sendInvoiceEmailAction}>
-            <input type="hidden" name="invoiceId" value={invoice.id} />
+          <form method="post" action={`/api/invoices/${invoice.id}/send-invoice`}>
             <button type="submit" className="secondary">
               Mock Send Invoice Email
             </button>
           </form>
 
-          <form action={sendPaymentLinkEmailAction}>
-            <input type="hidden" name="invoiceId" value={invoice.id} />
+          <form method="post" action={`/api/invoices/${invoice.id}/send-payment-link`}>
+            <select name="paymentMethod" defaultValue={selectedMethod}>
+              {paymentConfig.enabledMethods.map((method) => (
+                <option key={method.id} value={method.id}>
+                  {method.label}
+                </option>
+              ))}
+            </select>
             <button type="submit" className="secondary">
               Mock Send Payment Link
             </button>
           </form>
 
-          <form action={sendReminderEmailAction}>
-            <input type="hidden" name="invoiceId" value={invoice.id} />
+          <form method="post" action={`/api/invoices/${invoice.id}/send-reminder`}>
             <button type="submit" className="secondary">
               Mock Send Reminder
             </button>
@@ -143,8 +167,7 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
 
       <section className="card">
         <h2>Notes</h2>
-        <form action={addInvoiceNoteAction}>
-          <input type="hidden" name="invoiceId" value={invoice.id} />
+        <form method="post" action={`/api/invoices/${invoice.id}/notes`}>
           <textarea name="note" required placeholder="Internal note" />
           <button type="submit">Save Note</button>
         </form>
@@ -155,7 +178,7 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
         <ul>
           {invoice.activities.map((activity) => (
             <li key={activity.id}>
-              <strong>{activity.type.toLowerCase()}:</strong> {activity.message}{" "}
+              <strong>{getActivityTypeLabel(activity.type)}:</strong> {activity.message}{" "}
               <span className="muted">({formatDate(activity.createdAt)})</span>
             </li>
           ))}

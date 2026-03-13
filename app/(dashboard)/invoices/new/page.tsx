@@ -1,5 +1,4 @@
-import { createInvoiceAction } from "@/lib/actions";
-import { INVOICE_STATUSES } from "@/lib/constants";
+import { INVOICE_STATUSES, INVOICE_STATUS_LABELS } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 
 export default async function NewInvoicePage() {
@@ -14,7 +13,7 @@ export default async function NewInvoicePage() {
       <p className="muted">
         Line items format: <code>Description|Quantity|Unit Price</code> (one line per item).
       </p>
-      <form action={createInvoiceAction} className="grid two">
+      <form method="post" action="/api/invoices" className="grid two">
         <label>
           Customer
           <select name="customerId" required defaultValue="">
@@ -58,10 +57,10 @@ export default async function NewInvoicePage() {
 
         <label>
           Initial status
-          <select name="status" defaultValue="DRAFT">
+          <select name="status" defaultValue="draft">
             {INVOICE_STATUSES.map((status) => (
               <option key={status} value={status}>
-                {status.toLowerCase()}
+                {INVOICE_STATUS_LABELS[status]}
               </option>
             ))}
           </select>

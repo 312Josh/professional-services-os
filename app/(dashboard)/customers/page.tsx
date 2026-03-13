@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { createCustomerAction } from "@/lib/actions";
 import { formatDate } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
@@ -20,7 +19,7 @@ export default async function CustomersPage() {
     <div className="grid" style={{ gap: "1rem" }}>
       <section className="card">
         <h1>Customers</h1>
-        <form action={createCustomerAction} className="grid three">
+        <form method="post" action="/api/customers" className="grid three">
           <label>
             Name
             <input name="name" required />

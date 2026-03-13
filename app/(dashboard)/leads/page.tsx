@@ -1,10 +1,4 @@
-import {
-  addLeadNoteAction,
-  convertLeadToCustomerAction,
-  createLeadAction,
-  updateLeadStatusAction
-} from "@/lib/actions";
-import { LEAD_STATUSES } from "@/lib/constants";
+import { getLeadStatusLabel, LEAD_STATUSES, LEAD_STATUS_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
@@ -19,7 +13,7 @@ export default async function LeadsPage() {
       <section className="card">
         <h1>Leads</h1>
         <p className="muted">Statuses: new, contacted, converted, disqualified.</p>
-        <form action={createLeadAction} className="grid three">
+        <form method="post" action="/api/leads" className="grid three">
           <label>
             Name
             <input name="name" required />
@@ -74,7 +68,7 @@ export default async function LeadsPage() {
                   </td>
                   <td>{lead.serviceRequested || "-"}</td>
                   <td>
-                    <span className="badge">{lead.status.toLowerCase()}</span>
+                    <span className="badge">{getLeadStatusLabel(lead.status)}</span>
                     {lead.disqualifyReason ? <div className="muted">Reason: {lead.disqualifyReason}</div> : null}
                     {lead.convertedCustomer ? (
                       <div className="muted">Customer: {lead.convertedCustomer.name}</div>
@@ -82,12 +76,11 @@ export default async function LeadsPage() {
                   </td>
                   <td>
                     <div className="row-actions">
-                      <form action={updateLeadStatusAction}>
-                        <input type="hidden" name="leadId" value={lead.id} />
-                        <select name="status" defaultValue={lead.status}>
+                      <form method="post" action={`/api/leads/${lead.id}/status`}>
+                        <select name="status" defaultValue={lead.status.toLowerCase()}>
                           {LEAD_STATUSES.map((status) => (
                             <option key={status} value={status}>
-                              {status.toLowerCase()}
+                              {LEAD_STATUS_LABELS[status]}
                             </option>
                           ))}
                         </select>
@@ -98,16 +91,14 @@ export default async function LeadsPage() {
                       </form>
 
                       {lead.convertedCustomerId ? null : (
-                        <form action={convertLeadToCustomerAction}>
-                          <input type="hidden" name="leadId" value={lead.id} />
+                        <form method="post" action={`/api/leads/${lead.id}/convert`}>
                           <button type="submit" className="success">
                             Convert to Customer
                           </button>
                         </form>
                       )}
 
-                      <form action={addLeadNoteAction}>
-                        <input type="hidden" name="leadId" value={lead.id} />
+                      <form method="post" action={`/api/leads/${lead.id}/notes`}>
                         <input name="note" placeholder="Add note" required />
                         <button type="submit">Save Note</button>
                       </form>

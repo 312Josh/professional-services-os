@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { addCustomerNoteAction, createJobAction } from "@/lib/actions";
+import { getInvoiceStatusLabel, getJobStatusLabel } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 export default async function CustomerDetailPage({ params }: { params: { id: string } }) {
   const customer = await prisma.customer.findUnique({
@@ -10,7 +12,7 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
     include: {
       jobs: { orderBy: { createdAt: "desc" } },
       invoices: { orderBy: { createdAt: "desc" } },
-      activities: { where: { type: "NOTE" }, orderBy: { createdAt: "desc" }, take: 20 }
+      activities: { where: { type: "note" }, orderBy: { createdAt: "desc" }, take: 20 }
     }
   });
 
@@ -36,17 +38,18 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
 
       <section className="card">
         <h2>Add Note</h2>
-        <form action={addCustomerNoteAction}>
-          <input type="hidden" name="customerId" value={customer.id} />
-          <textarea name="note" required placeholder="Customer note" />
+        <form method="post" action={`/api/customers/${customer.id}/notes`} className="grid" style={{ gap: "0.75rem" }}>
+          <label style={{ display: "grid", gap: "0.35rem" }}>
+            Note
+            <textarea name="note" required placeholder="Customer note" />
+          </label>
           <button type="submit">Save Note</button>
         </form>
       </section>
 
       <section className="card">
         <h2>Create Job</h2>
-        <form action={createJobAction} className="grid two">
-          <input type="hidden" name="customerId" value={customer.id} />
+        <form method="post" action={`/api/customers/${customer.id}/jobs`} className="grid two">
           <label>
             Title
             <input name="title" required placeholder="Service call" />
@@ -78,7 +81,7 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
               {customer.jobs.map((job) => (
                 <tr key={job.id}>
                   <td>{job.title}</td>
-                  <td>{job.status.toLowerCase()}</td>
+                  <td>{getJobStatusLabel(job.status)}</td>
                   <td>{formatDate(job.serviceDate)}</td>
                 </tr>
               ))}
@@ -104,7 +107,7 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
                   <td>
                     <Link href={`/invoices/${invoice.id}`}>{invoice.invoiceNumber}</Link>
                   </td>
-                  <td>{invoice.status.toLowerCase()}</td>
+                  <td>{getInvoiceStatusLabel(invoice.status)}</td>
                   <td>{formatCurrency(invoice.totalCents)}</td>
                 </tr>
               ))}

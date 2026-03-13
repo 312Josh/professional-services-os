@@ -1,20 +1,32 @@
 "use server";
 
-import { randomBytes } from "crypto";
-import { type Activity, type Invoice, type Prisma } from "@prisma/client";
+import { type Activity, type Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { clearSession, createSession, requireAdmin, verifyPassword } from "@/lib/auth";
-import { INVOICE_STATUSES, JOB_STATUSES, LEAD_STATUSES } from "@/lib/constants";
+import { clearSession, createSession, requireAdmin, sanitizeRedirectPath, verifyPassword } from "@/lib/auth";
+import {
+  type InvoiceStatus,
+  type JobStatus,
+  type LeadStatus,
+  getInvoiceStatusLabel,
+  getJobStatusLabel,
+  getLeadStatusLabel,
+  INVOICE_STATUSES,
+  JOB_STATUSES,
+  LEAD_STATUSES
+} from "@/lib/constants";
 import {
   buildInvoiceEmailTemplate,
   buildPaymentLinkEmailTemplate,
   buildReminderEmailTemplate
 } from "@/lib/email";
 import { parseCurrencyToCents } from "@/lib/format";
+import { type InvoiceActionNotice } from "@/lib/invoice-action-notice";
+import { buildMockPaymentDestination, getPaymentMethodLabel, resolvePaymentMethod } from "@/lib/payments";
 import { prisma } from "@/lib/prisma";
 
 const DASHBOARD_PATHS = ["/dashboard", "/leads", "/customers", "/jobs", "/invoices", "/activity"];
+const DEMO_EMAIL_FOOTER = "Demo mode: email delivery and payment processing are simulated.";
 
 function asString(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -49,28 +61,31 @@ async function recordActivity(input: Prisma.ActivityCreateInput): Promise<Activi
   return prisma.activity.create({ data: input });
 }
 
-function parseLeadStatus(rawStatus: string): string {
-  if (!LEAD_STATUSES.includes(rawStatus as (typeof LEAD_STATUSES)[number])) {
+function parseLeadStatus(rawStatus: string): LeadStatus {
+  const status = rawStatus.toLowerCase();
+  if (!LEAD_STATUSES.includes(status as LeadStatus)) {
     throw new Error("Invalid lead status.");
   }
 
-  return rawStatus;
+  return status as LeadStatus;
 }
 
-function parseJobStatus(rawStatus: string): string {
-  if (!JOB_STATUSES.includes(rawStatus as (typeof JOB_STATUSES)[number])) {
+function parseJobStatus(rawStatus: string): JobStatus {
+  const status = rawStatus.toLowerCase();
+  if (!JOB_STATUSES.includes(status as JobStatus)) {
     throw new Error("Invalid job status.");
   }
 
-  return rawStatus;
+  return status as JobStatus;
 }
 
-function parseInvoiceStatus(rawStatus: string): string {
-  if (!INVOICE_STATUSES.includes(rawStatus as (typeof INVOICE_STATUSES)[number])) {
+function parseInvoiceStatus(rawStatus: string): InvoiceStatus {
+  const status = rawStatus.toLowerCase();
+  if (!INVOICE_STATUSES.includes(status as InvoiceStatus)) {
     throw new Error("Invalid invoice status.");
   }
 
-  return rawStatus;
+  return status as InvoiceStatus;
 }
 
 function parseLineItems(raw: string) {
@@ -121,17 +136,123 @@ async function nextInvoiceNumber(): Promise<string> {
   return `INV-${datePart}-${serial}`;
 }
 
+type InvoiceWithCustomer = Prisma.InvoiceGetPayload<{
+  include: { customer: true };
+}>;
+
+type MockEmailResult = {
+  delivered: boolean;
+  recipient: string;
+  reason?: string;
+};
+
+function createNotice(level: InvoiceActionNotice["level"], message: string): InvoiceActionNotice {
+  return { level, message };
+}
+
+function normalizeInvoiceStatus(status: string): InvoiceStatus {
+  return INVOICE_STATUSES.includes(status as InvoiceStatus) ? (status as InvoiceStatus) : "draft";
+}
+
+async function mockSendEmail(
+  invoice: InvoiceWithCustomer,
+  template: {
+    subject: string;
+    body: string;
+  }
+): Promise<MockEmailResult> {
+  const recipient = invoice.customer.email?.trim() || "";
+  const safeSubject = `[Demo] ${template.subject}`;
+
+  if (!recipient) {
+    console.log("[MOCK EMAIL SKIPPED]", {
+      invoiceId: invoice.id,
+      customerId: invoice.customerId,
+      reason: "missing customer email",
+      subject: safeSubject,
+      body: template.body
+    });
+
+    return {
+      delivered: false,
+      recipient: "[missing-customer-email]",
+      reason: "Customer has no email on file."
+    };
+  }
+
+  // Placeholder email provider integration point (SMTP/Resend/SES later).
+  console.log("[MOCK EMAIL]", {
+    to: recipient,
+    subject: safeSubject,
+    body: template.body
+  });
+
+  return {
+    delivered: true,
+    recipient
+  };
+}
+
+async function generateDemoPaymentLink(
+  invoice: Pick<InvoiceWithCustomer, "id" | "invoiceNumber" | "totalCents" | "customerId">,
+  adminId: string,
+  requestedMethod: string | null | undefined,
+  source: string
+): Promise<{
+  invoice: InvoiceWithCustomer;
+  notice: InvoiceActionNotice;
+}> {
+  const method = resolvePaymentMethod(requestedMethod);
+  const destination = buildMockPaymentDestination({
+    method,
+    invoiceId: invoice.id,
+    invoiceNumber: invoice.invoiceNumber,
+    totalCents: invoice.totalCents
+  });
+
+  const updatedInvoice = await prisma.invoice.update({
+    where: { id: invoice.id },
+    data: {
+      paymentMethod: destination.method,
+      paymentLink: destination.url
+    },
+    include: { customer: true }
+  });
+
+  await recordActivity({
+    type: "payment_link_generated",
+    message: `Demo payment link generated (${destination.methodLabel}) for invoice ${updatedInvoice.invoiceNumber} via ${source}`,
+    admin: { connect: { id: adminId } },
+    customer: { connect: { id: updatedInvoice.customerId } },
+    invoice: { connect: { id: updatedInvoice.id } }
+  });
+
+  return {
+    invoice: updatedInvoice,
+    notice: createNotice(
+      "success",
+      `${destination.destinationLabel} created with ${destination.methodLabel}. ${destination.demoMessage}`
+    )
+  };
+}
+
 export async function loginAction(formData: FormData): Promise<void> {
   const email = asString(formData, "email").toLowerCase();
   const password = asString(formData, "password");
+  const nextPath = sanitizeRedirectPath(asString(formData, "next"));
 
   const admin = await prisma.admin.findUnique({ where: { email } });
   if (!admin || !(await verifyPassword(password, admin.passwordHash))) {
-    redirect(`/login?error=${encodeURIComponent("Invalid credentials")}`);
+    const search = new URLSearchParams({ error: "Invalid credentials" });
+    if (nextPath) {
+      search.set("next", nextPath);
+    }
+
+    redirect(`/login?${search.toString()}`);
   }
 
   await createSession(admin.id);
-  redirect("/dashboard");
+  redirect(nextPath || "/dashboard");
 }
 
 export async function logoutAction(): Promise<void> {
@@ -186,7 +307,7 @@ export async function updateLeadStatusAction(formData: FormData): Promise<void> 
 
   await recordActivity({
     type: "status_change",
-    message: `Lead ${lead.name} status changed to ${status.toLowerCase()}`,
+    message: `Lead ${lead.name} status changed to ${getLeadStatusLabel(status)}`,
     admin: { connect: { id: admin.id } },
     lead: { connect: { id: lead.id } }
   });
@@ -345,7 +466,7 @@ export async function updateJobStatusAction(formData: FormData): Promise<void> {
 
   await recordActivity({
     type: "status_change",
-    message: `Job ${job.title} status changed to ${status.toLowerCase()}`,
+    message: `Job ${job.title} status changed to ${getJobStatusLabel(status)}`,
     admin: { connect: { id: admin.id } },
     customer: { connect: { id: job.customerId } },
     job: { connect: { id: job.id } }
@@ -390,7 +511,7 @@ export async function createInvoiceAction(formData: FormData): Promise<void> {
   const taxCents = Math.round(subtotalCents * (safeTaxRate / 100));
   const totalCents = subtotalCents + taxCents;
 
-  const status = parseInvoiceStatus(asString(formData, "status") || "DRAFT");
+  const status = parseInvoiceStatus(asString(formData, "status") || "draft");
   const invoiceNumber = await nextInvoiceNumber();
 
   const invoice = await prisma.invoice.create({
@@ -435,7 +556,7 @@ export async function updateInvoiceStatusAction(formData: FormData): Promise<voi
 
   await recordActivity({
     type: "status_change",
-    message: `Invoice ${invoice.invoiceNumber} status changed to ${status.toLowerCase()}`,
+    message: `Invoice ${invoice.invoiceNumber} status changed to ${getInvoiceStatusLabel(status)}`,
     admin: { connect: { id: admin.id } },
     customer: { connect: { id: invoice.customerId } },
     invoice: { connect: { id: invoice.id } }
@@ -445,43 +566,28 @@ export async function updateInvoiceStatusAction(formData: FormData): Promise<voi
   revalidatePath(`/invoices/${invoiceId}`);
 }
 
-export async function generatePaymentLinkAction(formData: FormData): Promise<void> {
+export async function generatePaymentLinkAction(formData: FormData): Promise<InvoiceActionNotice> {
   const admin = await requireAdmin();
   const invoiceId = asString(formData, "invoiceId");
+  const requestedMethod = asString(formData, "paymentMethod");
 
-  const token = randomBytes(12).toString("hex");
-  const paymentLink = `https://payments.placeholder.local/pay/${invoiceId}?token=${token}`;
-
-  const invoice = await prisma.invoice.update({
+  const invoice = await prisma.invoice.findUnique({
     where: { id: invoiceId },
-    data: { paymentLink }
+    include: { customer: true }
   });
 
-  await recordActivity({
-    type: "payment_link_generated",
-    message: `Payment link generated for invoice ${invoice.invoiceNumber}`,
-    admin: { connect: { id: admin.id } },
-    customer: { connect: { id: invoice.customerId } },
-    invoice: { connect: { id: invoice.id } }
-  });
+  if (!invoice) {
+    return createNotice("error", "Invoice not found. Demo payment link was not generated.");
+  }
+
+  const result = await generateDemoPaymentLink(invoice, admin.id, requestedMethod, "invoice action");
 
   revalidateDashboardPaths();
   revalidatePath(`/invoices/${invoiceId}`);
+  return result.notice;
 }
 
-async function mockSendEmail(invoice: Invoice & { customer: { name: string; email: string | null } }, template: {
-  subject: string;
-  body: string;
-}) {
-  // Placeholder email provider integration point (SMTP/Resend/SES/Stripe receipts later).
-  console.log("[MOCK EMAIL]", {
-    to: invoice.customer.email,
-    subject: template.subject,
-    body: template.body
-  });
-}
-
-export async function sendInvoiceEmailAction(formData: FormData): Promise<void> {
+export async function sendInvoiceEmailAction(formData: FormData): Promise<InvoiceActionNotice> {
   const admin = await requireAdmin();
   const invoiceId = asString(formData, "invoiceId");
 
@@ -491,22 +597,29 @@ export async function sendInvoiceEmailAction(formData: FormData): Promise<void> 
   });
 
   if (!invoice) {
-    throw new Error("Invoice not found.");
+    return createNotice("error", "Invoice not found. Demo invoice email was not sent.");
   }
 
-  const template = buildInvoiceEmailTemplate(invoice.customer, invoice);
-  await mockSendEmail(invoice, template);
+  const template = buildInvoiceEmailTemplate(invoice.customer, invoice, {
+    demoFooter: DEMO_EMAIL_FOOTER
+  });
+  const emailResult = await mockSendEmail(invoice, template);
+  const currentStatus = normalizeInvoiceStatus(invoice.status);
 
   const updated = await prisma.invoice.update({
     where: { id: invoice.id },
     data: {
-      status: invoice.status === "draft" ? "sent" : invoice.status
+      status: currentStatus === "draft" ? "sent" : currentStatus
     }
   });
 
+  const activityMessage = emailResult.delivered
+    ? `Demo invoice email sent to ${emailResult.recipient}: ${template.subject}`
+    : `Demo invoice email skipped: ${emailResult.reason}`;
+
   await recordActivity({
     type: "email_sent",
-    message: `Invoice email mock-sent: ${template.subject}`,
+    message: activityMessage,
     admin: { connect: { id: admin.id } },
     customer: { connect: { id: updated.customerId } },
     invoice: { connect: { id: updated.id } }
@@ -514,9 +627,69 @@ export async function sendInvoiceEmailAction(formData: FormData): Promise<void> 
 
   revalidateDashboardPaths();
   revalidatePath(`/invoices/${invoiceId}`);
+
+  if (emailResult.delivered) {
+    return createNotice("success", `Demo invoice email sent to ${emailResult.recipient}. No real email was sent.`);
+  }
+
+  return createNotice("warning", `Demo invoice email skipped: ${emailResult.reason}`);
 }
 
-export async function sendPaymentLinkEmailAction(formData: FormData): Promise<void> {
+export async function sendPaymentLinkEmailAction(formData: FormData): Promise<InvoiceActionNotice> {
+  const admin = await requireAdmin();
+  const invoiceId = asString(formData, "invoiceId");
+  const requestedMethod = asString(formData, "paymentMethod");
+
+  const invoice = await prisma.invoice.findUnique({
+    where: { id: invoiceId },
+    include: { customer: true }
+  });
+
+  if (!invoice) {
+    return createNotice("error", "Invoice not found. Demo payment-link email was not sent.");
+  }
+
+  let workingInvoice = invoice;
+  let linkFallbackMessage = "";
+  if (!workingInvoice.paymentLink) {
+    const linkResult = await generateDemoPaymentLink(workingInvoice, admin.id, requestedMethod, "payment-link email fallback");
+    workingInvoice = linkResult.invoice;
+    linkFallbackMessage = " A demo payment link was generated automatically.";
+  }
+
+  const paymentMethodLabel = getPaymentMethodLabel(workingInvoice.paymentMethod);
+  const template = buildPaymentLinkEmailTemplate(workingInvoice.customer, workingInvoice, {
+    paymentMethodLabel,
+    demoFooter: DEMO_EMAIL_FOOTER
+  });
+  const emailResult = await mockSendEmail(workingInvoice, template);
+
+  const activityMessage = emailResult.delivered
+    ? `Demo payment-link email sent via ${paymentMethodLabel} to ${emailResult.recipient}: ${template.subject}`
+    : `Demo payment-link email skipped: ${emailResult.reason}`;
+
+  await recordActivity({
+    type: "email_sent",
+    message: activityMessage,
+    admin: { connect: { id: admin.id } },
+    customer: { connect: { id: workingInvoice.customerId } },
+    invoice: { connect: { id: workingInvoice.id } }
+  });
+
+  revalidateDashboardPaths();
+  revalidatePath(`/invoices/${invoiceId}`);
+
+  if (emailResult.delivered) {
+    return createNotice(
+      "success",
+      `Demo payment-link email sent to ${emailResult.recipient} using ${paymentMethodLabel}.${linkFallbackMessage}`
+    );
+  }
+
+  return createNotice("warning", `Demo payment-link email skipped: ${emailResult.reason}.${linkFallbackMessage}`);
+}
+
+export async function sendReminderEmailAction(formData: FormData): Promise<InvoiceActionNotice> {
   const admin = await requireAdmin();
   const invoiceId = asString(formData, "invoiceId");
 
@@ -526,15 +699,23 @@ export async function sendPaymentLinkEmailAction(formData: FormData): Promise<vo
   });
 
   if (!invoice) {
-    throw new Error("Invoice not found.");
+    return createNotice("error", "Invoice not found. Demo reminder email was not sent.");
   }
 
-  const template = buildPaymentLinkEmailTemplate(invoice.customer, invoice);
-  await mockSendEmail(invoice, template);
+  const paymentMethodLabel = invoice.paymentMethod ? getPaymentMethodLabel(invoice.paymentMethod) : undefined;
+  const template = buildReminderEmailTemplate(invoice.customer, invoice, {
+    paymentMethodLabel,
+    demoFooter: DEMO_EMAIL_FOOTER
+  });
+  const emailResult = await mockSendEmail(invoice, template);
+
+  const activityMessage = emailResult.delivered
+    ? `Demo reminder email sent to ${emailResult.recipient}: ${template.subject}`
+    : `Demo reminder email skipped: ${emailResult.reason}`;
 
   await recordActivity({
     type: "email_sent",
-    message: `Payment link email mock-sent: ${template.subject}`,
+    message: activityMessage,
     admin: { connect: { id: admin.id } },
     customer: { connect: { id: invoice.customerId } },
     invoice: { connect: { id: invoice.id } }
@@ -542,34 +723,12 @@ export async function sendPaymentLinkEmailAction(formData: FormData): Promise<vo
 
   revalidateDashboardPaths();
   revalidatePath(`/invoices/${invoiceId}`);
-}
 
-export async function sendReminderEmailAction(formData: FormData): Promise<void> {
-  const admin = await requireAdmin();
-  const invoiceId = asString(formData, "invoiceId");
-
-  const invoice = await prisma.invoice.findUnique({
-    where: { id: invoiceId },
-    include: { customer: true }
-  });
-
-  if (!invoice) {
-    throw new Error("Invoice not found.");
+  if (emailResult.delivered) {
+    return createNotice("success", `Demo reminder email sent to ${emailResult.recipient}. No real email was sent.`);
   }
 
-  const template = buildReminderEmailTemplate(invoice.customer, invoice);
-  await mockSendEmail(invoice, template);
-
-  await recordActivity({
-    type: "email_sent",
-    message: `Reminder email mock-sent: ${template.subject}`,
-    admin: { connect: { id: admin.id } },
-    customer: { connect: { id: invoice.customerId } },
-    invoice: { connect: { id: invoice.id } }
-  });
-
-  revalidateDashboardPaths();
-  revalidatePath(`/invoices/${invoiceId}`);
+  return createNotice("warning", `Demo reminder email skipped: ${emailResult.reason}`);
 }
 
 export async function addInvoiceNoteAction(formData: FormData): Promise<void> {

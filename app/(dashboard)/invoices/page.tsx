@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getInvoiceStatusLabel } from "@/lib/constants";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 
@@ -44,7 +45,7 @@ export default async function InvoicesPage() {
                   </td>
                   <td>{invoice.customer.name}</td>
                   <td>{invoice.job?.title || "-"}</td>
-                  <td>{invoice.status.toLowerCase()}</td>
+                  <td>{getInvoiceStatusLabel(invoice.status)}</td>
                   <td>{formatCurrency(invoice.totalCents)}</td>
                   <td>{formatDate(invoice.dueDate)}</td>
                 </tr>
