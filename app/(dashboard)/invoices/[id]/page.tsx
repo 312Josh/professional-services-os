@@ -1,4 +1,5 @@
 import { getActivityTypeLabel, getInvoiceStatusLabel, INVOICE_STATUSES, INVOICE_STATUS_LABELS } from "@/lib/constants";
+import { appConfig } from "@/lib/app-config";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { readInvoiceActionNotice } from "@/lib/invoice-action-notice";
 import { getPaymentConfig, getPaymentMethodLabel, resolvePaymentMethod } from "@/lib/payments";
@@ -69,7 +70,8 @@ export default async function InvoiceDetailPage({ params, searchParams }: Invoic
           )}
         </p>
         <p className="muted">
-          Demo-safe payment mode. Primary method: <strong>{getPaymentMethodLabel(paymentConfig.primaryMethod)}</strong>. Enabled:
+          {appConfig.copy.invoicePaymentModeLabel} Primary method:{" "}
+          <strong>{getPaymentMethodLabel(paymentConfig.primaryMethod)}</strong>. Enabled:
           {" "}
           {paymentConfig.enabledMethods.map((method) => method.label).join(", ")}.
         </p>
@@ -112,7 +114,7 @@ export default async function InvoiceDetailPage({ params, searchParams }: Invoic
 
       <section className="card">
         <h2>Invoice Actions</h2>
-        <p className="muted">Invoice and payment emails are intentionally demo/mock actions.</p>
+        <p className="muted">{appConfig.copy.invoiceActionsSubtitle}</p>
         <div className="row-actions">
           <form method="post" action={`/api/invoices/${invoice.id}/status`}>
             <select name="status" defaultValue={invoice.status.toLowerCase()}>

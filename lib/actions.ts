@@ -20,13 +20,14 @@ import {
   buildPaymentLinkEmailTemplate,
   buildReminderEmailTemplate
 } from "@/lib/email";
+import { appConfig } from "@/lib/app-config";
 import { parseCurrencyToCents } from "@/lib/format";
 import { type InvoiceActionNotice } from "@/lib/invoice-action-notice";
 import { buildMockPaymentDestination, getPaymentMethodLabel, resolvePaymentMethod } from "@/lib/payments";
 import { prisma } from "@/lib/prisma";
 
 const DASHBOARD_PATHS = ["/dashboard", "/leads", "/customers", "/jobs", "/invoices", "/activity"];
-const DEMO_EMAIL_FOOTER = "Demo mode: email delivery and payment processing are simulated.";
+const DEMO_EMAIL_FOOTER = appConfig.copy.demoEmailFooter;
 
 function asString(formData: FormData, key: string): string {
   const value = formData.get(key);

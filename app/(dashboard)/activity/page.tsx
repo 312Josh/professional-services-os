@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { appConfig } from "@/lib/app-config";
 import { getActivityTypeLabel } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
@@ -13,7 +14,7 @@ export default async function ActivityPage() {
   return (
     <section className="card">
       <h1>Notes & Activity</h1>
-      <p className="muted">Audit trail of status changes, conversions, notes, and mock emails.</p>
+      <p className="muted">{appConfig.copy.activitySubtitle}</p>
       <div className="table-wrap">
         <table>
           <thead>

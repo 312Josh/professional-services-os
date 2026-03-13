@@ -2,9 +2,10 @@ import { randomBytes } from "crypto";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { appConfig } from "@/lib/app-config";
 import { prisma } from "@/lib/prisma";
 
-const COOKIE_NAME = process.env.SESSION_COOKIE_NAME || "plumbing_admin_session";
+const COOKIE_NAME = appConfig.auth.sessionCookieName;
 const parsedSessionTtlHours = Number.parseInt(process.env.SESSION_TTL_HOURS || "168", 10);
 const SESSION_TTL_HOURS = Number.isFinite(parsedSessionTtlHours) && parsedSessionTtlHours > 0 ? parsedSessionTtlHours : 168;
 

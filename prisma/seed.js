@@ -2,13 +2,16 @@ const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
+const businessName = (process.env.BUSINESS_NAME || "BluePipe Plumbing").trim() || "BluePipe Plumbing";
+const demoAdminEmail = (process.env.DEMO_ADMIN_EMAIL || "admin@plumbing.local").trim() || "admin@plumbing.local";
+const demoAdminPassword = (process.env.DEMO_ADMIN_PASSWORD || "admin123").trim() || "admin123";
 
 function toCents(value) {
   return Math.round(value * 100);
 }
 
 async function main() {
-  const passwordHash = await bcrypt.hash("admin123", 10);
+  const passwordHash = await bcrypt.hash(demoAdminPassword, 10);
 
   await prisma.activity.deleteMany();
   await prisma.invoiceLineItem.deleteMany();
@@ -19,9 +22,9 @@ async function main() {
   await prisma.session.deleteMany();
 
   const admin = await prisma.admin.upsert({
-    where: { email: "admin@plumbing.local" },
+    where: { email: demoAdminEmail },
     create: {
-      email: "admin@plumbing.local",
+      email: demoAdminEmail,
       name: "Shop Admin",
       passwordHash,
     },
@@ -105,7 +108,7 @@ async function main() {
       totalCents,
       paymentMethod: "stripe",
       paymentLink: "https://payments.example.com/pay/inv-demo-1001",
-      notes: "Thank you for choosing BluePipe Plumbing.",
+      notes: `Thank you for choosing ${businessName}.`,
       lineItems: {
         create: [
           {
@@ -168,7 +171,7 @@ async function main() {
     ],
   });
 
-  console.log("Seed complete. Login: admin@plumbing.local / admin123");
+  console.log(`Seed complete. Login: ${demoAdminEmail} / ${demoAdminPassword}`);
 }
 
 main()

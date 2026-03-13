@@ -1,4 +1,5 @@
 import { formatCurrency, formatDate } from "@/lib/format";
+import { appConfig } from "@/lib/app-config";
 
 type CustomerSnapshot = {
   name: string;
@@ -33,7 +34,7 @@ export function buildInvoiceEmailTemplate(
   invoice: InvoiceSnapshot,
   options: EmailTemplateOptions = {}
 ) {
-  const subject = `Invoice ${invoice.invoiceNumber} from BluePipe Plumbing`;
+  const subject = `Invoice ${invoice.invoiceNumber} from ${appConfig.brand.businessName}`;
   const body = appendDemoFooter(
     [
       `Hi ${customer.name},`,
@@ -42,8 +43,8 @@ export function buildInvoiceEmailTemplate(
       `Total due: ${formatCurrency(invoice.totalCents)}.`,
       invoice.dueDate ? `Due date: ${formatDate(invoice.dueDate)}.` : "",
       "",
-      "Reply to this email if you have any questions.",
-      "BluePipe Plumbing"
+      appConfig.copy.emailReplyPrompt,
+      appConfig.brand.businessName
     ],
     options.demoFooter
   );
@@ -67,7 +68,7 @@ export function buildPaymentLinkEmailTemplate(
       "",
       paymentMethodLine,
       `Total due: ${formatCurrency(invoice.totalCents)}.`,
-      "BluePipe Plumbing"
+      appConfig.brand.businessName
     ],
     options.demoFooter
   );
@@ -93,7 +94,7 @@ export function buildReminderEmailTemplate(
       invoice.paymentLink ? `Payment link: ${invoice.paymentLink}` : "",
       "",
       "If you already paid, please ignore this message.",
-      "BluePipe Plumbing"
+      appConfig.brand.businessName
     ],
     options.demoFooter
   );

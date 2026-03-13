@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { appConfig } from "@/lib/app-config";
 import { requireAdmin } from "@/lib/auth";
 
 const navItems = [
@@ -16,7 +17,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="shell">
       <aside className="sidebar">
-        <h2>BluePipe Ops</h2>
+        <h2>{appConfig.brand.appShortTitle}</h2>
         <small>{admin.name}</small>
         <nav>
           {navItems.map((item) => (

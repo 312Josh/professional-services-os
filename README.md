@@ -28,8 +28,8 @@ Private plumbing operations app built with Next.js + Prisma + SQLite.
 6. `npm run dev`
 7. Open `http://localhost:3000`
 8. Login with:
-   - Email: `admin@plumbing.local`
-   - Password: `admin123`
+   - Email: `admin@plumbing.local` (or `DEMO_ADMIN_EMAIL`)
+   - Password: `admin123` (or `DEMO_ADMIN_PASSWORD`)
 
 ## Useful Commands
 - `npm run dev` - start dev server
@@ -44,6 +44,13 @@ Private plumbing operations app built with Next.js + Prisma + SQLite.
 - `SESSION_TTL_HOURS`: positive integer session lifetime in hours (invalid values fall back to `168`)
 - `PAYMENT_METHODS`: comma-separated enabled demo methods (defaults to `stripe,zelle,venmo,paypal`)
 - `PAYMENT_PRIMARY_METHOD`: preferred demo method when none is selected (defaults to `stripe`)
+- `PAYMENT_METHODS_DEFAULT`: fallback enabled methods used when `PAYMENT_METHODS` is unset
+- `PAYMENT_PRIMARY_METHOD_DEFAULT`: fallback primary method used when `PAYMENT_PRIMARY_METHOD` is unset
+- `BUSINESS_NAME`, `APP_TITLE`, `APP_SHORT_TITLE`, `APP_DESCRIPTION`: white-label brand identity strings
+- `LOGIN_SUBTITLE`, `DASHBOARD_TITLE`, `DASHBOARD_SUBTITLE`, `ACTIVITY_SUBTITLE`: white-label UI copy seams
+- `INVOICE_PAYMENT_MODE_LABEL`, `INVOICE_ACTIONS_SUBTITLE`, `EMAIL_REPLY_PROMPT`, `DEMO_EMAIL_FOOTER`: white-label invoice/email/demo copy seams
+- `DEMO_ADMIN_EMAIL`, `DEMO_ADMIN_PASSWORD`: seeded admin credentials + login form defaults
+- `DEMO_PAYMENT_ZELLE_RECIPIENT`, `DEMO_PAYMENT_VENMO_HANDLE`, `DEMO_PAYMENT_PAYPAL_HANDLE`, `DEMO_PAYMENT_FALLBACK_BASE_URL`: payment destination defaults for demo link generation
 
 ## Notes
 - Email sending is mock-only and logs to server console + activity feed with demo notices.

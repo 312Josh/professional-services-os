@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { appConfig } from "@/lib/app-config";
 
-const SESSION_COOKIE_NAME = process.env.SESSION_COOKIE_NAME || "plumbing_admin_session";
+const SESSION_COOKIE_NAME = appConfig.auth.sessionCookieName;
 
 const PROTECTED_PREFIXES = ["/dashboard", "/leads", "/customers", "/jobs", "/invoices", "/activity"] as const;
 

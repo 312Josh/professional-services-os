@@ -1,8 +1,7 @@
 import { randomBytes } from "crypto";
+import { appConfig, paymentMethodCatalog, type AppPaymentMethod, PAYMENT_METHOD_IDS } from "@/lib/app-config";
 
-const SUPPORTED_PAYMENT_METHODS = ["stripe", "zelle", "venmo", "paypal"] as const;
-
-export type PaymentMethod = (typeof SUPPORTED_PAYMENT_METHODS)[number];
+export type PaymentMethod = AppPaymentMethod;
 
 export type PaymentMethodConfig = {
   id: PaymentMethod;
@@ -25,30 +24,10 @@ export type MockPaymentDestination = {
 };
 
 const PAYMENT_METHODS: Record<PaymentMethod, PaymentMethodConfig> = {
-  stripe: {
-    id: "stripe",
-    label: "Stripe",
-    type: "integrated",
-    description: "Card checkout with Stripe-style hosted flow"
-  },
-  zelle: {
-    id: "zelle",
-    label: "Zelle",
-    type: "manual",
-    description: "Bank transfer handoff via Zelle"
-  },
-  venmo: {
-    id: "venmo",
-    label: "Venmo",
-    type: "manual",
-    description: "Peer payment handoff via Venmo"
-  },
-  paypal: {
-    id: "paypal",
-    label: "PayPal",
-    type: "manual",
-    description: "PayPal.me handoff"
-  }
+  stripe: paymentMethodCatalog.stripe,
+  zelle: paymentMethodCatalog.zelle,
+  venmo: paymentMethodCatalog.venmo,
+  paypal: paymentMethodCatalog.paypal
 };
 
 function normalizePaymentMethod(rawValue: string | null | undefined): PaymentMethod | null {
@@ -57,12 +36,12 @@ function normalizePaymentMethod(rawValue: string | null | undefined): PaymentMet
   }
 
   const normalized = rawValue.trim().toLowerCase();
-  return SUPPORTED_PAYMENT_METHODS.includes(normalized as PaymentMethod) ? (normalized as PaymentMethod) : null;
+  return PAYMENT_METHOD_IDS.includes(normalized as PaymentMethod) ? (normalized as PaymentMethod) : null;
 }
 
 function parseEnabledPaymentMethods(rawValue: string | undefined): PaymentMethod[] {
   if (!rawValue) {
-    return [...SUPPORTED_PAYMENT_METHODS];
+    return [...PAYMENT_METHOD_IDS];
   }
 
   const methods = rawValue
@@ -71,15 +50,17 @@ function parseEnabledPaymentMethods(rawValue: string | undefined): PaymentMethod
     .filter((value): value is PaymentMethod => Boolean(value));
 
   if (methods.length === 0) {
-    return [...SUPPORTED_PAYMENT_METHODS];
+    return [...PAYMENT_METHOD_IDS];
   }
 
   return [...new Set(methods)];
 }
 
 export function getPaymentConfig(): PaymentConfig {
-  const enabledMethodIds = parseEnabledPaymentMethods(process.env.PAYMENT_METHODS);
-  const requestedPrimary = normalizePaymentMethod(process.env.PAYMENT_PRIMARY_METHOD);
+  const enabledMethodIds = parseEnabledPaymentMethods(process.env.PAYMENT_METHODS || appConfig.payments.defaultEnabledMethodsCsv);
+  const requestedPrimary = normalizePaymentMethod(
+    process.env.PAYMENT_PRIMARY_METHOD || appConfig.payments.defaultPrimaryMethod
+  );
 
   const primaryMethod =
     requestedPrimary && enabledMethodIds.includes(requestedPrimary)
@@ -129,46 +110,50 @@ export function buildMockPaymentDestination(input: {
   const token = randomBytes(10).toString("hex");
   const amount = formatDollars(totalCents);
   const encodedMemo = encodeURIComponent(`Invoice ${invoiceNumber}`);
+  const zelleRecipient = encodeURIComponent(appConfig.payments.destinationDefaults.zelleRecipient);
+  const venmoHandle = encodeURIComponent(appConfig.payments.destinationDefaults.venmoHandle);
+  const paypalHandle = encodeURIComponent(appConfig.payments.destinationDefaults.paypalHandle);
+  const fallbackBaseUrl = appConfig.payments.destinationDefaults.fallbackBaseUrl.replace(/\/+$/, "");
 
   switch (method) {
     case "stripe":
       return {
         method,
         methodLabel,
-        destinationLabel: "Stripe Checkout Session (Demo)",
+        destinationLabel: paymentMethodCatalog.stripe.destinationLabel,
         url: `https://checkout.stripe.com/c/pay/cs_test_${token}`,
-        demoMessage: "Demo mode: Stripe checkout is mocked and does not create real charges."
+        demoMessage: paymentMethodCatalog.stripe.demoMessage
       };
     case "zelle":
       return {
         method,
         methodLabel,
-        destinationLabel: "Zelle Transfer Request (Demo)",
-        url: `https://pay.zelle.com/payments?recipient=ap%40bluepipeplumbing.demo&amount=${amount}&memo=${encodedMemo}&ref=${invoiceId}`,
-        demoMessage: "Demo mode: Zelle transfer request is mocked for demo-safe flows."
+        destinationLabel: paymentMethodCatalog.zelle.destinationLabel,
+        url: `https://pay.zelle.com/payments?recipient=${zelleRecipient}&amount=${amount}&memo=${encodedMemo}&ref=${invoiceId}`,
+        demoMessage: paymentMethodCatalog.zelle.demoMessage
       };
     case "venmo":
       return {
         method,
         methodLabel,
-        destinationLabel: "Venmo Payment Link (Demo)",
-        url: `https://venmo.com/u/BluePipePlumbing?txn=pay&amount=${amount}&note=${encodedMemo}&ref=${invoiceId}`,
-        demoMessage: "Demo mode: Venmo handoff is mocked and no transfer is created."
+        destinationLabel: paymentMethodCatalog.venmo.destinationLabel,
+        url: `https://venmo.com/u/${venmoHandle}?txn=pay&amount=${amount}&note=${encodedMemo}&ref=${invoiceId}`,
+        demoMessage: paymentMethodCatalog.venmo.demoMessage
       };
     case "paypal":
       return {
         method,
         methodLabel,
-        destinationLabel: "PayPal.me Request (Demo)",
-        url: `https://www.paypal.com/paypalme/bluepipeplumbing/${amount}?note=${encodedMemo}`,
-        demoMessage: "Demo mode: PayPal request is mocked and no payment is captured."
+        destinationLabel: paymentMethodCatalog.paypal.destinationLabel,
+        url: `https://www.paypal.com/paypalme/${paypalHandle}/${amount}?note=${encodedMemo}`,
+        demoMessage: paymentMethodCatalog.paypal.demoMessage
       };
     default:
       return {
         method,
         methodLabel,
         destinationLabel: "Payment Request (Demo)",
-        url: `https://payments.bluepipe.demo/pay/${invoiceId}?token=${token}`,
+        url: `${fallbackBaseUrl}/pay/${invoiceId}?token=${token}`,
         demoMessage: "Demo mode: Payment request is mocked."
       };
   }

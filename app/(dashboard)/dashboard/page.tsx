@@ -5,6 +5,7 @@ import {
   getInvoiceStatusLabel,
   getLeadStatusLabel
 } from "@/lib/constants";
+import { appConfig } from "@/lib/app-config";
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/format";
 
@@ -26,8 +27,8 @@ export default async function DashboardPage() {
     <>
       <div className="topbar">
         <div>
-          <h1>Operations Dashboard</h1>
-          <p className="muted">Private CRM + invoicing for your plumbing business.</p>
+          <h1>{appConfig.copy.dashboardTitle}</h1>
+          <p className="muted">{appConfig.copy.dashboardSubtitle}</p>
         </div>
       </div>
 

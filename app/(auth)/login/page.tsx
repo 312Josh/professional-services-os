@@ -1,4 +1,5 @@
 import { getCurrentAdmin, sanitizeRedirectPath } from "@/lib/auth";
+import { appConfig } from "@/lib/app-config";
 import { redirect } from "next/navigation";
 
 export default async function LoginPage({
@@ -17,22 +18,24 @@ export default async function LoginPage({
   return (
     <div className="login-wrap">
       <div className="card login-card">
-        <h1>BluePipe Plumbing</h1>
-        <p className="muted">Admin login for the operations dashboard.</p>
+        <h1>{appConfig.brand.businessName}</h1>
+        <p className="muted">{appConfig.copy.loginSubtitle}</p>
         {error ? <p style={{ color: "#b13a3a" }}>{error}</p> : null}
         <form method="post" action="/api/login">
           {nextPath ? <input type="hidden" name="next" value={nextPath} /> : null}
           <label>
             Email
-            <input name="email" type="email" required defaultValue="admin@plumbing.local" />
+            <input name="email" type="email" required defaultValue={appConfig.auth.demoAdminEmail} />
           </label>
           <label>
             Password
-            <input name="password" type="password" required defaultValue="admin123" />
+            <input name="password" type="password" required defaultValue={appConfig.auth.demoAdminPassword} />
           </label>
           <button type="submit">Sign In</button>
         </form>
-        <small>Seed credentials: admin@plumbing.local / admin123</small>
+        <small>
+          Seed credentials: {appConfig.auth.demoAdminEmail} / {appConfig.auth.demoAdminPassword}
+        </small>
       </div>
     </div>
   );
