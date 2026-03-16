@@ -336,6 +336,65 @@ export default async function DashboardPage() {
         </section>
       </div>
 
+      {(leadSummary.staleCount > 0 || leadSummary.followUpNeededCount > 0) && (
+        <section className="card" style={{ marginTop: "1rem", borderLeft: "4px solid var(--danger)" }}>
+          <h2>⚠️ Missed Leads — Needs Rescue</h2>
+          <p className="muted">These leads went cold. Every hour without contact drops conversion probability.</p>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Lead</th>
+                  <th>Time Since Submission</th>
+                  <th>Issue</th>
+                  <th>Revenue at Risk</th>
+                  <th>Rescue</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leadLeakageQueue.map((lead) => (
+                  <tr key={lead.id} className="lead-row lead-row-stale">
+                    <td>
+                      <strong>{lead.name}</strong>
+                      <div className="muted">{lead.serviceRequested || "—"}</div>
+                      <div className="muted">{lead.phone || lead.email || "No contact"}</div>
+                    </td>
+                    <td>
+                      <strong style={{ color: "var(--danger)", fontSize: "1.1em" }}>{formatMinutesAgo(lead.ageMinutes)}</strong>
+                      <div className="muted">Submitted {formatDate(lead.createdAt)}</div>
+                    </td>
+                    <td>
+                      <span className={`badge ${lead.isStale ? "danger" : "warning"}`}>
+                        {lead.isStale ? "Stale — no response" : "Follow-up overdue"}
+                      </span>
+                      <div className="muted">Last touched {formatMinutesAgo(lead.lastTouchedMinutes)}</div>
+                    </td>
+                    <td><strong>{formatCurrency(lead.riskRevenueCents)}</strong></td>
+                    <td>
+                      <div className="priority-actions">
+                        {lead.phone ? <a href={`tel:${lead.phone}`}>📞 Call Now</a> : null}
+                        {lead.email ? <a href={`mailto:${lead.email}`}>📧 Email</a> : null}
+                        {lead.isNewUnworked ? (
+                          <form method="post" action={`/api/leads/${lead.id}/status`}>
+                            <input type="hidden" name="status" value="contacted" />
+                            <button type="submit" className="secondary">Mark Contacted</button>
+                          </form>
+                        ) : (
+                          <form method="post" action={`/api/leads/${lead.id}/notes`}>
+                            <input type="hidden" name="note" value="Rescue follow-up attempted from dashboard." />
+                            <button type="submit" className="secondary">Log Follow-up</button>
+                          </form>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
       <div className="grid two" style={{ marginTop: "1rem" }}>
         <section className="card">
           <h2>What Got Booked</h2>
