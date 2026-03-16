@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { execSync } from "child_process";
-import { existsSync } from "fs";
+import { copyFileSync, existsSync } from "fs";
+import { join } from "path";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -8,36 +8,42 @@ declare global {
   var dbInitialized: boolean | undefined;
 }
 
-function initDb(client: PrismaClient) {
+function ensureDb() {
   if (global.dbInitialized) return;
   global.dbInitialized = true;
 
   const dbUrl = process.env.DATABASE_URL || "";
-  const isFileBased = dbUrl.startsWith("file:");
-  if (!isFileBased) return;
+  if (!dbUrl.startsWith("file:")) return;
 
-  // Extract file path from DATABASE_URL (file:/tmp/dev.db → /tmp/dev.db)
   const filePath = dbUrl.replace(/^file:/, "");
-  const dbExists = existsSync(filePath);
+  if (existsSync(filePath)) return;
 
-  if (!dbExists) {
-    try {
-      console.log("[db-init] DB not found at", filePath, "— running setup...");
-      execSync("npx prisma db push --accept-data-loss", {
-        env: { ...process.env },
-        stdio: "inherit",
-        timeout: 30000,
-      });
-      execSync("node prisma/seed.js", {
-        env: { ...process.env },
-        stdio: "inherit",
-        timeout: 30000,
-      });
-      console.log("[db-init] DB initialized and seeded.");
-    } catch (e) {
-      console.error("[db-init] Failed:", e);
+  // In production (Vercel), copy the bundled seed DB to /tmp
+  const seedPaths = [
+    join(process.cwd(), "prisma", "seed.db"),
+    join(__dirname, "..", "prisma", "seed.db"),
+    "/var/task/prisma/seed.db",
+    "/var/task/.next/server/prisma/seed.db",
+  ];
+
+  for (const seedPath of seedPaths) {
+    if (existsSync(seedPath)) {
+      try {
+        copyFileSync(seedPath, filePath);
+        console.log(`[db-init] Copied seed DB from ${seedPath} to ${filePath}`);
+        return;
+      } catch (e) {
+        console.error(`[db-init] Failed to copy from ${seedPath}:`, e);
+      }
     }
   }
+
+  console.error("[db-init] No seed DB found at:", seedPaths.join(", "));
+}
+
+// Initialize DB before creating the client
+if (process.env.NODE_ENV === "production") {
+  ensureDb();
 }
 
 export const prisma =
@@ -48,9 +54,4 @@ export const prisma =
 
 if (process.env.NODE_ENV !== "production") {
   global.prisma = prisma;
-}
-
-// Auto-init DB in production if missing (Vercel /tmp SQLite pattern)
-if (process.env.NODE_ENV === "production") {
-  initDb(prisma);
 }
