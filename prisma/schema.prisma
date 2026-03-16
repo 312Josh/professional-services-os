@@ -141,3 +141,28 @@ model Activity {
 
   @@schema("plumbing_os")
 }
+
+model ProofAsset {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  businessName  String
+  niche         String?
+  city          String?
+  state         String?
+  phone         String?
+  website       String?
+  painPoints    String[] @default([])
+  repName       String?
+  repBookingLink String?
+  config        String   // Full JSON config for rendering
+  pageUrl       String?
+  videoUrl      String?
+  screenshotUrl String?
+  status        String   @default("pending") // pending, generating, ready, error
+  errorMessage  String?
+  generatedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@schema("plumbing_os")
+}

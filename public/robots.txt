@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /leads
+Disallow: /customers
+Disallow: /jobs
+Disallow: /invoices
+Disallow: /activity
+Disallow: /api/
+Disallow: /login
+
+Sitemap: https://plumbing-os.vercel.app/sitemap.xml
