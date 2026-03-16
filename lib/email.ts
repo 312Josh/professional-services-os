@@ -1,6 +1,37 @@
 import { formatCurrency, formatDate } from "@/lib/format";
 import { appConfig } from "@/lib/app-config";
 
+type LeadSnapshot = {
+  id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  serviceRequested: string | null;
+  source: string | null;
+  address: string | null;
+};
+
+export function buildNewLeadAlertEmail(lead: LeadSnapshot, demoFooter?: string) {
+  const subject = `🚨 New Lead: ${lead.name} — ${lead.serviceRequested || "Service request"}`;
+  const lines = [
+    `New lead just came in.`,
+    "",
+    `Name: ${lead.name}`,
+    lead.phone ? `Phone: ${lead.phone}` : "",
+    lead.email ? `Email: ${lead.email}` : "",
+    lead.serviceRequested ? `Service: ${lead.serviceRequested}` : "",
+    lead.address ? `Address: ${lead.address}` : "",
+    lead.source ? `Source: ${lead.source}` : "",
+    "",
+    `Respond now — speed to first contact is the #1 conversion driver.`,
+    "",
+    appConfig.brand.businessName,
+  ].filter(Boolean);
+
+  const body = demoFooter ? [...lines, "", demoFooter].join("\n") : lines.join("\n");
+  return { subject, body };
+}
+
 type CustomerSnapshot = {
   name: string;
   email: string | null;

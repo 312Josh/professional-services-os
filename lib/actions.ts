@@ -17,6 +17,7 @@ import {
 } from "@/lib/constants";
 import {
   buildInvoiceEmailTemplate,
+  buildNewLeadAlertEmail,
   buildPaymentLinkEmailTemplate,
   buildReminderEmailTemplate
 } from "@/lib/email";
@@ -322,6 +323,19 @@ export async function createLeadAction(formData: FormData): Promise<void> {
       lead: { connect: { id: lead.id } }
     });
   }
+
+  // Instant lead alert — notify owner immediately
+  const alertTemplate = buildNewLeadAlertEmail(
+    { id: lead.id, name: lead.name, phone: lead.phone, email: lead.email, serviceRequested: lead.serviceRequested, source: lead.source, address: lead.address },
+    DEMO_EMAIL_FOOTER
+  );
+  console.log("[LEAD ALERT]", { to: admin.email, subject: alertTemplate.subject, body: alertTemplate.body });
+  await recordActivity({
+    type: "email_sent",
+    message: `Lead alert sent: ${alertTemplate.subject}`,
+    admin: { connect: { id: admin.id } },
+    lead: { connect: { id: lead.id } }
+  });
 
   revalidateDashboardPaths();
 }
