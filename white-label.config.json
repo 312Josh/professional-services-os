@@ -1,0 +1,63 @@
+{
+  "brand": {
+    "companyName": "Apex Plumbing & HVAC",
+    "tagline": "Fast. Reliable. Guaranteed.",
+    "appTitle": "Apex Field Service Ops",
+    "appShortTitle": "Apex Ops",
+    "phone": "(555) 123-4567",
+    "serviceArea": "Chicago Metro Area",
+    "yearsInBusiness": 12,
+    "accentColor": "#0b6a8f",
+    "accentColorMuted": "#2f4758",
+    "successColor": "#0c8d4f",
+    "dangerColor": "#b13a3a",
+    "surfaceTintColor": "#eaf6ff",
+    "logoUrl": ""
+  },
+  "services": [
+    "Plumbing",
+    "HVAC",
+    "Drain Cleaning",
+    "Water Heaters",
+    "Sewer & Water Lines",
+    "Emergency Service"
+  ],
+  "trustBadges": [
+    { "label": "Licensed & Insured", "icon": "🛡️" },
+    { "label": "Background Checked", "icon": "✅" },
+    { "label": "Satisfaction Guaranteed", "icon": "⭐" },
+    { "label": "Up-Front Pricing", "icon": "💰" },
+    { "label": "Same-Day Service", "icon": "⚡" },
+    { "label": "24/7 Emergency", "icon": "🚨" }
+  ],
+  "reviews": [
+    { "name": "Sarah M.", "rating": 5, "text": "Called at 7am with a burst pipe. They were here by 7:30. Fixed it in under an hour. Saved my basement.", "date": "2 weeks ago", "service": "Emergency Plumbing" },
+    { "name": "David K.", "rating": 5, "text": "Best HVAC company I've worked with. Installed a new furnace, explained everything, cleaned up perfectly.", "date": "1 month ago", "service": "HVAC Installation" },
+    { "name": "Jennifer R.", "rating": 5, "text": "Third time using them. Always on time, always fair pricing. My go-to for anything plumbing.", "date": "3 weeks ago", "service": "Drain Cleaning" },
+    { "name": "Mike T.", "rating": 4, "text": "Quick response, professional crew. Fixed our water heater same day. Price was fair.", "date": "1 month ago", "service": "Water Heater Repair" },
+    { "name": "Lisa P.", "rating": 5, "text": "They replaced our entire sewer line. Massive job. Came in on budget and ahead of schedule.", "date": "2 months ago", "service": "Sewer Replacement" }
+  ],
+  "operations": {
+    "responseTimeMinutes": 15,
+    "newLeadAlertMinutes": 20,
+    "staleLeadHours": 24,
+    "followUpLeadHours": 48,
+    "defaultLeadValueCents": 65000
+  },
+  "copy": {
+    "loginSubtitle": "Owner login for your operations command center.",
+    "dashboardTitle": "Owner Dashboard",
+    "dashboardSubtitle": "See what needs attention now, where revenue is at risk, and what to do next.",
+    "leadsTitle": "Leads",
+    "leadIntakeCta": "Save Lead to Priority Queue",
+    "leadDefaultSource": "Inbound request"
+  },
+  "payments": {
+    "methods": ["stripe", "zelle", "venmo", "paypal"],
+    "primaryMethod": "stripe"
+  },
+  "demo": {
+    "adminEmail": "owner@fieldops.local",
+    "adminPassword": "admin123"
+  }
+}
