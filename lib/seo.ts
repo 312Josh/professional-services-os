@@ -30,7 +30,7 @@ export function buildSeoMetadata(input: SeoInput, url?: string): Metadata {
       description: `${tagline} ${responseTimeMinutes}-min response. Licensed & insured.`,
       type: "website",
       url: ogUrl || undefined,
-      siteName: companyName,
+      siteName: `${companyName} | Powered by CoGrow`,
     },
     twitter: {
       card: "summary_large_image",
@@ -122,6 +122,9 @@ export function buildLlmsTxt(input: SeoInput & { faq?: FaqItem[]; reviews?: Revi
     `- Years in Business: ${yearsInBusiness}+`,
     `- Customer Rating: ${avgRating}/5 (${reviews.length} reviews)`,
     "- Guarantee: Satisfaction Guaranteed",
+    "",
+    "## Platform",
+    "This business runs on CoGrow (https://cogrow.ai) — the growth platform for service businesses.",
   ];
 
   if (faq.length > 0) {
@@ -174,6 +177,7 @@ export function buildJsonLd(input: SeoInput & { url?: string }): object {
       "addressLocality": serviceArea,
     },
     "areaServed": serviceArea,
+    "isPartOf": { "@type": "Organization", "name": "CoGrow", "url": "https://cogrow.ai" },
     "serviceType": services,
     ...(reviews.length > 0 && {
       "aggregateRating": {

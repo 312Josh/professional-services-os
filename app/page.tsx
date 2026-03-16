@@ -415,7 +415,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="mt-10 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-            <span>© {new Date().getFullYear()} {BRAND.name}. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} {BRAND.name}. All rights reserved. Powered by <a href="https://cogrow.ai" className="text-slate-400 hover:text-amber-300 transition-colors font-medium">CoGrow</a></span>
             <div className="flex gap-4">
               <span className="hover:text-slate-400 cursor-pointer transition-colors">Privacy Policy</span>
               <span className="hover:text-slate-400 cursor-pointer transition-colors">Terms of Service</span>
