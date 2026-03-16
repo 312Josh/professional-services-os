@@ -165,6 +165,16 @@ export function buildProofConfig(input: ProofInput) {
     operations: {
       responseTimeMinutes: 15,
     },
+    sticky: {
+      showLeadNotificationBar: true,
+      showResponseTimeCard: true,
+      showMissedLeadBadge: true,
+      showActivityFeed: true,
+      showCompetitorComparison: true,
+      showWeeklyDigest: true,
+      showReviewToast: true,
+      industryAvgResponseHours: 47,
+    },
   };
 }
 

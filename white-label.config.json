@@ -142,5 +142,16 @@
       "question": "Do you guarantee your work?",
       "answer": "Yes. All of our work comes with a satisfaction guarantee. If something is not right, we will make it right at no additional cost."
     }
-  ]
+  ],
+  "sticky": {
+    "showLeadNotificationBar": true,
+    "showResponseTimeCard": true,
+    "showMissedLeadBadge": true,
+    "showActivityFeed": true,
+    "showCompetitorComparison": true,
+    "showWeeklyDigest": true,
+    "showReviewToast": true,
+    "industryAvgResponseHours": 47,
+    "missedLeadThresholdMinutes": 120
+  }
 }

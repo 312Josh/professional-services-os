@@ -15,9 +15,34 @@ import {
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { OwnerMetricCard, UrgencyBanner } from "@/app/(dashboard)/_components/owner-panels";
+import {
+  LeadNotificationBar,
+  ResponseTimeCard,
+  MissedLeadBadge,
+  ActivityFeed,
+  CompetitorComparison,
+  ReviewToast,
+  WeeklyDigest
+} from "@/app/(dashboard)/_components/sticky-widgets";
+import {
+  getDemoLeadCount,
+  getDemoResponseTime,
+  getDemoMissedLeads,
+  getDemoActivityFeed,
+  getDemoCompetitorComparison,
+  getDemoWeeklyDigest
+} from "@/lib/sticky-demo";
 
 export default async function DashboardPage() {
   const now = new Date();
+
+  // Sticky engagement data (demo mode)
+  const demoLeadCount = getDemoLeadCount();
+  const demoResponse = getDemoResponseTime();
+  const demoMissed = getDemoMissedLeads();
+  const demoFeed = getDemoActivityFeed();
+  const demoComparison = getDemoCompetitorComparison();
+  const demoDigest = getDemoWeeklyDigest();
   const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -121,8 +146,21 @@ export default async function DashboardPage() {
     ? `Decision aligned with readiness threshold (${proofPointCount}/${appConfig.trustLayer.minProofPointsToBuild} proof points).`
     : `Readiness check suggests "${recommendedTrustMode}" (${proofPointCount}/${appConfig.trustLayer.minProofPointsToBuild} proof points).`;
 
+  // Pick a recent lead for the notification bar
+  const latestLead = recentLeads[0];
+
   return (
     <>
+      {/* Sticky: Lead notification bar */}
+      <LeadNotificationBar
+        count={demoLeadCount}
+        latestName={latestLead?.name || "Sarah M."}
+        latestService={latestLead?.serviceRequested || "Emergency Service"}
+      />
+
+      {/* Sticky: Missed lead alert */}
+      <MissedLeadBadge count={demoMissed} />
+
       <div className="topbar">
         <div>
           <h1>{appConfig.copy.dashboardTitle}</h1>
@@ -473,6 +511,34 @@ export default async function DashboardPage() {
           </p>
         </section>
       </div>
+
+      {/* Sticky engagement widgets */}
+      <div className="grid two" style={{ marginTop: "1rem" }}>
+        {/* Response Time + Competitor Comparison */}
+        <div className="grid" style={{ gap: "1rem" }}>
+          <ResponseTimeCard avg={demoResponse.avg} trend={demoResponse.trend} prevAvg={demoResponse.prevAvg} />
+          <CompetitorComparison yours={demoComparison.yours} industryHours={47} multiplier={demoComparison.multiplier} />
+        </div>
+
+        {/* Activity Feed */}
+        <section className="card">
+          <h2>Live Activity</h2>
+          <ActivityFeed items={demoFeed} />
+        </section>
+      </div>
+
+      {/* Weekly Digest */}
+      <div style={{ marginTop: "1rem" }}>
+        <WeeklyDigest data={demoDigest} />
+      </div>
+
+      {/* Review notification toast (shows most recent simulated review) */}
+      {demoFeed.find((f) => f.type === "review") && (
+        <ReviewToast
+          name={demoFeed.find((f) => f.type === "review")!.text.replace(/⭐ New \d-star review from /, "")}
+          rating={5}
+        />
+      )}
     </>
   );
 }
