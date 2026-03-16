@@ -19,7 +19,10 @@ export default async function DashboardPage() {
   const now = new Date();
   const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  const [leadPool, openInvoices, recentInvoices, recentLeads, recentlyBookedJobs] = await Promise.all([
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+
+  const [leadPool, openInvoices, recentInvoices, recentLeads, recentlyBookedJobs, todaysJobs] = await Promise.all([
     prisma.lead.findMany({
       where: { status: { in: ["new", "contacted"] } },
       orderBy: { createdAt: "desc" }
@@ -40,6 +43,14 @@ export default async function DashboardPage() {
       include: { customer: true, lead: true },
       orderBy: { createdAt: "desc" },
       take: 6
+    }),
+    prisma.job.findMany({
+      where: {
+        status: { in: ["scheduled", "in_progress"] },
+        serviceDate: { gte: todayStart, lt: todayEnd }
+      },
+      include: { customer: true },
+      orderBy: { serviceDate: "asc" }
     })
   ]);
 
@@ -128,36 +139,36 @@ export default async function DashboardPage() {
 
       <div className="grid four" style={{ marginBottom: "1rem" }}>
         <OwnerMetricCard
-          title="Needs attention now"
-          value={String(attentionNowCount)}
-          detail={`${leadSummary.attentionNowCount} lead issues + ${overdueSentInvoices.length} overdue invoices`}
-          tone={attentionNowCount > 0 ? "danger" : "success"}
-          href="/leads"
-          ctaLabel="Work priorities"
-        />
-        <OwnerMetricCard
-          title="Response late"
-          value={String(leadSummary.responseLateCount)}
-          detail={`New leads older than ${appConfig.ownerOps.newLeadAlertMinutes}m and not yet stale`}
-          tone={leadSummary.responseLateCount > 0 ? "warning" : "success"}
+          title="New leads"
+          value={String(leadSummary.newUnworkedCount)}
+          detail={leadSummary.newUnworkedCount > 0 ? "Need response now" : "All leads worked"}
+          tone={leadSummary.newUnworkedCount > 0 ? "danger" : "success"}
           href="/leads#priority-queue"
-          ctaLabel="Recover speed"
+          ctaLabel="Work leads"
         />
         <OwnerMetricCard
-          title="Money at risk"
-          value={formatCurrency(moneyAtRiskCents)}
-          detail={`${formatCurrency(leadSummary.slippingRevenueCents)} from stale/follow-up leads`}
-          tone={moneyAtRiskCents > 0 ? "warning" : "success"}
-          href="/leads#priority-queue"
-          ctaLabel="Protect pipeline"
+          title="Today's jobs"
+          value={String(todaysJobs.length)}
+          detail={todaysJobs.length > 0 ? todaysJobs.map(j => j.title).slice(0, 2).join(", ") : "No jobs scheduled today"}
+          tone={todaysJobs.length > 0 ? "success" : "warning"}
+          href="/jobs"
+          ctaLabel="View schedule"
         />
         <OwnerMetricCard
-          title="Unpaid now"
+          title="Unpaid invoices"
           value={formatCurrency(unpaidTotalCents)}
-          detail={`${openInvoices.length} draft/sent invoice${openInvoices.length === 1 ? "" : "s"} open`}
-          tone={unpaidTotalCents > 0 ? "warning" : "success"}
+          detail={`${openInvoices.length} open · ${overdueSentInvoices.length} overdue`}
+          tone={overdueSentInvoices.length > 0 ? "danger" : unpaidTotalCents > 0 ? "warning" : "success"}
           href="/invoices"
-          ctaLabel="Collect receivables"
+          ctaLabel="Collect"
+        />
+        <OwnerMetricCard
+          title="Missed leads"
+          value={String(leadSummary.staleCount + leadSummary.followUpNeededCount)}
+          detail={leadSummary.staleCount + leadSummary.followUpNeededCount > 0 ? `${formatCurrency(leadSummary.slippingRevenueCents)} at risk` : "No missed leads"}
+          tone={leadSummary.staleCount > 0 ? "danger" : leadSummary.followUpNeededCount > 0 ? "warning" : "success"}
+          href="/leads#priority-queue"
+          ctaLabel="Rescue"
         />
       </div>
 
