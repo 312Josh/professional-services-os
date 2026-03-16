@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Phone, Clock, Shield, Star, Zap, Scale, BookOpen, Briefcase, Users, Gavel, Home, ArrowRight, MapPin, Award, TrendingDown, MessageSquare, CalendarCheck, BarChart3, ChevronRight, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { LiveToast } from "@/components/live-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -76,6 +77,7 @@ function Stars({ count }: { count: number }) {
 export default function HomePage() {
   return (
     <div className="grain min-h-screen bg-white">
+      <LiveToast />
 
       {/* ══════════ LIVE NOTIFICATION BAR ══════════ */}
       <div className="bg-[#0f1f35] text-white text-center text-[13px] font-medium py-2.5 px-4 flex items-center justify-center gap-2">
@@ -124,10 +126,10 @@ export default function HomePage() {
 
             <motion.div custom={4} variants={fadeUp} className="mt-10 flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg" className="bg-amber-500 hover:bg-amber-400 text-[#0f1f35] font-bold text-base px-8 h-14 rounded-full shadow-lg shadow-amber-500/20 hover:shadow-amber-400/30 hover:scale-[1.02] transition-all">
-                <a href="#consult">
+                <Link href="/request">
                   Schedule Free Consultation
                   <ArrowRight className="w-4 h-4 ml-2" />
-                </a>
+                </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10 font-medium text-base px-8 h-14 rounded-full">
                 <a href="#how">See How It Works <ChevronRight className="w-4 h-4 ml-1" /></a>
