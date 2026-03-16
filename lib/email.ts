@@ -132,3 +132,31 @@ export function buildReminderEmailTemplate(
 
   return { subject, body };
 }
+
+/* ── Review request email ── */
+
+export function buildReviewRequestEmail(input: {
+  customerName: string;
+  jobTitle: string;
+  reviewUrl: string;
+}): { subject: string; body: string } {
+  const businessName = appConfig.brand.businessName;
+  const subject = `How was your ${input.jobTitle} service? — ${businessName}`;
+
+  const body = [
+    `Hi ${input.customerName},`,
+    "",
+    `Thank you for choosing ${businessName} for your ${input.jobTitle} service.`,
+    "",
+    "We'd love to hear how we did. A quick review helps other homeowners find reliable service:",
+    "",
+    input.reviewUrl,
+    "",
+    "It only takes 30 seconds and means the world to our team.",
+    "",
+    `Thank you,`,
+    businessName
+  ].join("\n");
+
+  return { subject, body };
+}

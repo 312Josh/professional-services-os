@@ -423,10 +423,110 @@ td {
   .sidebar {
     border-right: 0;
     border-bottom: 1px solid var(--line);
+    padding: 0.75rem;
+  }
+
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .sidebar a,
+  .sidebar-link {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.875rem;
   }
 
   .urgency-banner {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  main {
+    padding: 0.75rem;
+  }
+
+  .card {
+    padding: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .grid.two,
+  .grid.three,
+  .grid.four {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 1.35rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  .owner-metric-value {
+    font-size: 1.35rem;
+  }
+
+  .table-wrap {
+    margin: 0 -0.75rem;
+    padding: 0 0.75rem;
+  }
+
+  th,
+  td {
+    padding: 0.45rem 0.35rem;
+    font-size: 0.8125rem;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  button,
+  .button-link {
+    padding: 0.65rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px; /* prevents iOS zoom on focus */
+  }
+
+  .row-actions {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .priority-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell main {
+    padding: 0.5rem;
+  }
+
+  .card {
+    border-radius: 8px;
+  }
+
+  .sidebar a,
+  .sidebar-link {
+    font-size: 0.8125rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .nav-badge {
+    font-size: 0.65rem;
   }
 }

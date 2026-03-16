@@ -117,6 +117,78 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
       </section>
 
       <section className="card">
+        <h2>Customer Nurture</h2>
+        <p className="muted" style={{ marginBottom: "0.75rem" }}>Keep this customer coming back. Automated reminders fire based on last service date.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "0.75rem" }}>
+          {(() => {
+            const lastJob = customer.jobs[0];
+            const daysSinceService = lastJob?.serviceDate
+              ? Math.floor((Date.now() - new Date(lastJob.serviceDate).getTime()) / 86400000)
+              : null;
+            const reminders = [];
+
+            if (daysSinceService !== null && daysSinceService > 180) {
+              reminders.push({ icon: "🔧", label: "6-Month Maintenance Check", urgency: "high" });
+            }
+            if (daysSinceService !== null && daysSinceService > 330) {
+              reminders.push({ icon: "📅", label: "Annual Service Due", urgency: "high" });
+            }
+
+            // Seasonal reminders
+            const month = new Date().getMonth();
+            if (month >= 8 && month <= 10) {
+              reminders.push({ icon: "🍂", label: "Fall Furnace Tune-Up", urgency: "medium" });
+            }
+            if (month >= 2 && month <= 4) {
+              reminders.push({ icon: "🌱", label: "Spring AC Check", urgency: "medium" });
+            }
+            if (month === 11 || month <= 1) {
+              reminders.push({ icon: "❄️", label: "Winter Pipe Freeze Prevention", urgency: "medium" });
+            }
+
+            if (reminders.length === 0) {
+              reminders.push({ icon: "✅", label: "No reminders due", urgency: "low" });
+            }
+
+            return reminders.map((r, i) => (
+              <div key={i} style={{
+                padding: "0.75rem 1rem",
+                borderRadius: 8,
+                border: `1px solid ${r.urgency === "high" ? "#fca5a5" : r.urgency === "medium" ? "#fde68a" : "#d1d5db"}`,
+                background: r.urgency === "high" ? "#fef2f2" : r.urgency === "medium" ? "#fffbeb" : "#f9fafb",
+                fontSize: "0.875rem",
+                fontWeight: 600
+              }}>
+                {r.icon} {r.label}
+              </div>
+            ));
+          })()}
+        </div>
+        {customer.jobs.length > 0 && (
+          <div style={{ marginTop: "0.75rem" }}>
+            <a
+              href={`/review/${customer.jobs[0].id}`}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: "inline-block",
+                padding: "0.5rem 1rem",
+                borderRadius: 6,
+                background: "#f3f4f6",
+                color: "#374151",
+                fontSize: "0.8125rem",
+                fontWeight: 600,
+                textDecoration: "none",
+                border: "1px solid #d1d5db"
+              }}
+            >
+              ⭐ Send Review Request for Last Job
+            </a>
+          </div>
+        )}
+      </section>
+
+      <section className="card">
         <h2>Recent Notes</h2>
         <ul>
           {customer.activities.map((activity) => (
