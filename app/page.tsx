@@ -87,6 +87,25 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      {trust.faq.length > 0 && (
+        <section style={{ maxWidth: 900, margin: "0 auto", padding: "2.5rem 1.5rem" }}>
+          <h2 style={{ textAlign: "center", fontSize: "1.5rem", fontWeight: 700, marginBottom: "1.5rem" }}>Frequently Asked Questions</h2>
+          <div style={{ display: "grid", gap: "0.75rem" }}>
+            {trust.faq.map((item, i) => (
+              <details key={i} style={{ background: "white", borderRadius: 12, border: "1px solid #e5e7eb", overflow: "hidden" }}>
+                <summary style={{ padding: "1rem 1.25rem", cursor: "pointer", fontWeight: 600, fontSize: "0.9375rem", color: "#1a1a2e" }}>
+                  {item.question}
+                </summary>
+                <div style={{ padding: "0 1.25rem 1rem", color: "#4b5563", fontSize: "0.9375rem", lineHeight: 1.7 }}>
+                  {item.answer}
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Footer */}
       <footer style={{ textAlign: "center", padding: "1.5rem", color: "#9ca3af", fontSize: "0.8125rem" }}>
         © {new Date().getFullYear()} {trust.companyName}. Serving {trust.serviceArea}. Licensed & Insured.

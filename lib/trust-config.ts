@@ -14,6 +14,11 @@ export interface TrustBadge {
   icon: string;
 }
 
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
 export interface TrustConfig {
   companyName: string;
   tagline: string;
@@ -24,6 +29,7 @@ export interface TrustConfig {
   badges: TrustBadge[];
   reviews: Review[];
   services: string[];
+  faq: FaqItem[];
 }
 
 export function getTrustConfig(): TrustConfig {
@@ -37,5 +43,6 @@ export function getTrustConfig(): TrustConfig {
     badges: whitelabel.trustBadges || [],
     reviews: whitelabel.reviews || [],
     services: whitelabel.services || [],
+    faq: (whitelabel as any).faq || [],
   };
 }

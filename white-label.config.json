@@ -23,19 +23,67 @@
     "Emergency Service"
   ],
   "trustBadges": [
-    { "label": "Licensed & Insured", "icon": "🛡️" },
-    { "label": "Background Checked", "icon": "✅" },
-    { "label": "Satisfaction Guaranteed", "icon": "⭐" },
-    { "label": "Up-Front Pricing", "icon": "💰" },
-    { "label": "Same-Day Service", "icon": "⚡" },
-    { "label": "24/7 Emergency", "icon": "🚨" }
+    {
+      "label": "Licensed & Insured",
+      "icon": "\ud83d\udee1\ufe0f"
+    },
+    {
+      "label": "Background Checked",
+      "icon": "\u2705"
+    },
+    {
+      "label": "Satisfaction Guaranteed",
+      "icon": "\u2b50"
+    },
+    {
+      "label": "Up-Front Pricing",
+      "icon": "\ud83d\udcb0"
+    },
+    {
+      "label": "Same-Day Service",
+      "icon": "\u26a1"
+    },
+    {
+      "label": "24/7 Emergency",
+      "icon": "\ud83d\udea8"
+    }
   ],
   "reviews": [
-    { "name": "Sarah M.", "rating": 5, "text": "Called at 7am with a burst pipe. They were here by 7:30. Fixed it in under an hour. Saved my basement.", "date": "2 weeks ago", "service": "Emergency Plumbing" },
-    { "name": "David K.", "rating": 5, "text": "Best HVAC company I've worked with. Installed a new furnace, explained everything, cleaned up perfectly.", "date": "1 month ago", "service": "HVAC Installation" },
-    { "name": "Jennifer R.", "rating": 5, "text": "Third time using them. Always on time, always fair pricing. My go-to for anything plumbing.", "date": "3 weeks ago", "service": "Drain Cleaning" },
-    { "name": "Mike T.", "rating": 4, "text": "Quick response, professional crew. Fixed our water heater same day. Price was fair.", "date": "1 month ago", "service": "Water Heater Repair" },
-    { "name": "Lisa P.", "rating": 5, "text": "They replaced our entire sewer line. Massive job. Came in on budget and ahead of schedule.", "date": "2 months ago", "service": "Sewer Replacement" }
+    {
+      "name": "Sarah M.",
+      "rating": 5,
+      "text": "Called at 7am with a burst pipe. They were here by 7:30. Fixed it in under an hour. Saved my basement.",
+      "date": "2 weeks ago",
+      "service": "Emergency Plumbing"
+    },
+    {
+      "name": "David K.",
+      "rating": 5,
+      "text": "Best HVAC company I've worked with. Installed a new furnace, explained everything, cleaned up perfectly.",
+      "date": "1 month ago",
+      "service": "HVAC Installation"
+    },
+    {
+      "name": "Jennifer R.",
+      "rating": 5,
+      "text": "Third time using them. Always on time, always fair pricing. My go-to for anything plumbing.",
+      "date": "3 weeks ago",
+      "service": "Drain Cleaning"
+    },
+    {
+      "name": "Mike T.",
+      "rating": 4,
+      "text": "Quick response, professional crew. Fixed our water heater same day. Price was fair.",
+      "date": "1 month ago",
+      "service": "Water Heater Repair"
+    },
+    {
+      "name": "Lisa P.",
+      "rating": 5,
+      "text": "They replaced our entire sewer line. Massive job. Came in on budget and ahead of schedule.",
+      "date": "2 months ago",
+      "service": "Sewer Replacement"
+    }
   ],
   "operations": {
     "responseTimeMinutes": 15,
@@ -53,11 +101,46 @@
     "leadDefaultSource": "Inbound request"
   },
   "payments": {
-    "methods": ["stripe", "zelle", "venmo", "paypal"],
+    "methods": [
+      "stripe",
+      "zelle",
+      "venmo",
+      "paypal"
+    ],
     "primaryMethod": "stripe"
   },
   "demo": {
     "adminEmail": "owner@fieldops.local",
     "adminPassword": "admin123"
-  }
+  },
+  "faq": [
+    {
+      "question": "How fast do you respond to service calls?",
+      "answer": "We respond within 15 minutes to all service requests. Our technicians are stationed throughout the Chicago Metro Area so we can reach you quickly, even for emergencies."
+    },
+    {
+      "question": "Are your technicians licensed and insured?",
+      "answer": "Yes. Every technician is fully licensed, insured, and background-checked. We carry general liability and workers compensation insurance for your protection."
+    },
+    {
+      "question": "Do you offer free estimates?",
+      "answer": "Yes. We provide free, no-obligation estimates for all services. We give you the price upfront before any work begins \u2014 no surprises."
+    },
+    {
+      "question": "What areas do you serve?",
+      "answer": "We serve the entire Chicago Metro Area including all surrounding suburbs. Call us to confirm service availability in your specific location."
+    },
+    {
+      "question": "Do you offer emergency service?",
+      "answer": "Yes. We offer 24/7 emergency service for plumbing, HVAC, and drain emergencies. Call us anytime \u2014 nights, weekends, and holidays included."
+    },
+    {
+      "question": "What payment methods do you accept?",
+      "answer": "We accept all major credit cards, checks, Zelle, Venmo, and PayPal. Financing options are available for larger projects."
+    },
+    {
+      "question": "Do you guarantee your work?",
+      "answer": "Yes. All of our work comes with a satisfaction guarantee. If something is not right, we will make it right at no additional cost."
+    }
+  ]
 }

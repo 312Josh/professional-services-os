@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { buildSeoMetadata, buildJsonLd } from "@/lib/seo";
+import { buildSeoMetadata, buildJsonLd, buildFaqJsonLd, buildReviewJsonLd } from "@/lib/seo";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -35,6 +35,7 @@ type ProofConfig = {
   trustBadges: { label: string; icon: string }[];
   reviews: { name: string; service: string; text: string; rating: number; date: string }[];
   painPoints: string[];
+  faq?: { question: string; answer: string }[];
   rep: { name: string; bookingLink: string };
   operations: { responseTimeMinutes: number };
 };
@@ -44,7 +45,7 @@ export default async function ProofPage({ params }: { params: { slug: string } }
   if (!proof) notFound();
 
   const config: ProofConfig = JSON.parse(proof.config);
-  const { brand, services, trustBadges, reviews, painPoints, rep, operations } = config;
+  const { brand, services, trustBadges, reviews, painPoints, faq, rep, operations } = config;
   const stars = (n: number) => "⭐".repeat(n);
   const avgRating = reviews.length > 0
     ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
@@ -65,6 +66,8 @@ export default async function ProofPage({ params }: { params: { slug: string } }
   return (
     <div style={{ fontFamily: "system-ui, -apple-system, sans-serif", color: "#1a1a2e" }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {faq && faq.length > 0 && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buildFaqJsonLd(faq)) }} />}
+      {reviews.length > 0 && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buildReviewJsonLd(reviews, brand.companyName)) }} />}
       {/* Hero */}
       <header style={{ background: `linear-gradient(135deg, ${brand.accentColor} 0%, ${brand.accentColor}cc 100%)`, color: "white", padding: "3rem 1.5rem", textAlign: "center" }}>
         <h1 style={{ fontSize: "2.5rem", fontWeight: 800, margin: "0 0 0.5rem", lineHeight: 1.2 }}>{brand.companyName}</h1>
@@ -154,6 +157,25 @@ export default async function ProofPage({ params }: { params: { slug: string } }
           )}
         </div>
       </section>
+
+      {/* FAQ Section */}
+      {faq && faq.length > 0 && (
+        <section style={{ maxWidth: 900, margin: "0 auto", padding: "2.5rem 1.5rem" }}>
+          <h2 style={{ textAlign: "center", fontSize: "1.5rem", fontWeight: 700, marginBottom: "1.5rem" }}>Frequently Asked Questions</h2>
+          <div style={{ display: "grid", gap: "0.75rem" }}>
+            {faq.map((item: any, i: number) => (
+              <details key={i} style={{ background: "white", borderRadius: 12, border: "1px solid #e5e7eb", overflow: "hidden" }}>
+                <summary style={{ padding: "1rem 1.25rem", cursor: "pointer", fontWeight: 600, fontSize: "0.9375rem", color: "#1a1a2e" }}>
+                  {item.question}
+                </summary>
+                <div style={{ padding: "0 1.25rem 1rem", color: "#4b5563", fontSize: "0.9375rem", lineHeight: 1.7 }}>
+                  {item.answer}
+                </div>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Rep Attribution */}
       {rep.name && (

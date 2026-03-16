@@ -17,11 +17,14 @@ type ProofInput = {
   rep_booking_link?: string;
 };
 
+type FaqItem = { question: string; answer: string };
+
 type NicheConfig = {
   services: string[];
   trustBadges: { label: string; icon: string }[];
   reviews: { name: string; service: string; text: string; rating: number; date: string }[];
   accentColor: string;
+  faq: FaqItem[];
 };
 
 const NICHE_CONFIGS: Record<string, NicheConfig> = {
@@ -42,6 +45,13 @@ const NICHE_CONFIGS: Record<string, NicheConfig> = {
       { name: "Jennifer K.", service: "Emergency Repair", text: "Door came off the track at 10pm. They answered the phone and had someone out within an hour.", rating: 4, date: "1 month ago" },
     ],
     accentColor: "#1a5276",
+    faq: [
+      { question: "How fast can you repair my garage door?", answer: "We offer same-day service for most repairs. Our technicians carry common parts on their trucks so most repairs are completed in a single visit." },
+      { question: "Do you service all garage door brands?", answer: "Yes. We service all major brands including LiftMaster, Chamberlain, Genie, Clopay, Amarr, and Wayne Dalton." },
+      { question: "How much does a garage door spring replacement cost?", answer: "Spring replacement typically costs between $150-$350 depending on the type and size. We provide a free estimate before any work begins." },
+      { question: "Are your technicians licensed and insured?", answer: "Yes. Every technician is fully licensed, insured, and background-checked for your safety and peace of mind." },
+      { question: "Do you offer emergency garage door repair?", answer: "Yes. We offer 24/7 emergency service. If your garage door is stuck open or poses a security risk, call us anytime." },
+    ],
   },
   plumbing: {
     services: ["Plumbing", "HVAC", "Drain Cleaning", "Water Heaters", "Sewer & Water Lines", "Emergency Service"],
@@ -59,6 +69,12 @@ const NICHE_CONFIGS: Record<string, NicheConfig> = {
       { name: "Jennifer R.", service: "Drain Cleaning", text: "Third time using them. Always on time, always fair pricing. My go-to for anything plumbing.", rating: 5, date: "3 weeks ago" },
     ],
     accentColor: "#0b6a8f",
+    faq: [
+      { question: "How fast do you respond to service calls?", answer: "We respond within 15 minutes to all service requests. Our technicians are stationed throughout the area for fast response." },
+      { question: "Do you offer emergency plumbing service?", answer: "Yes. We offer 24/7 emergency service for burst pipes, sewer backups, and no-heat emergencies." },
+      { question: "Are your plumbers licensed?", answer: "Yes. Every technician is fully licensed, insured, and background-checked." },
+      { question: "Do you provide free estimates?", answer: "Yes. We provide free, no-obligation estimates with upfront pricing before any work begins." },
+    ],
   },
   electrical: {
     services: ["Electrical Repair", "Panel Upgrades", "Wiring", "Lighting Installation", "EV Charger Install", "Emergency Service"],
@@ -76,6 +92,12 @@ const NICHE_CONFIGS: Record<string, NicheConfig> = {
       { name: "Mark S.", service: "Wiring Repair", text: "Fixed a tricky wiring issue other electricians couldn't figure out. Fair price. Problem solved.", rating: 5, date: "3 weeks ago" },
     ],
     accentColor: "#b8860b",
+    faq: [
+      { question: "Are your electricians licensed?", answer: "Yes. All of our electricians are licensed master electricians with full insurance coverage." },
+      { question: "Do you handle panel upgrades?", answer: "Yes. We specialize in panel upgrades from 100A to 200A or 400A to support modern electrical loads and EV chargers." },
+      { question: "Can you install an EV charger?", answer: "Yes. We install Level 2 EV chargers for all vehicle makes. We handle permitting and inspection." },
+      { question: "Do you offer free estimates?", answer: "Yes. We provide free electrical estimates with no obligation." },
+    ],
   },
   hvac: {
     services: ["AC Repair", "Furnace Repair", "HVAC Installation", "Duct Cleaning", "Maintenance Plans", "Emergency Service"],
@@ -93,6 +115,12 @@ const NICHE_CONFIGS: Record<string, NicheConfig> = {
       { name: "Nancy W.", service: "Maintenance", text: "Signed up for their maintenance plan. Two visits a year, never had a breakdown since.", rating: 5, date: "3 weeks ago" },
     ],
     accentColor: "#c0392b",
+    faq: [
+      { question: "How fast can you get here for an AC emergency?", answer: "We offer same-day emergency service and respond within 15 minutes to most calls." },
+      { question: "Do you service all HVAC brands?", answer: "Yes. We service all major brands including Carrier, Lennox, Trane, Rheem, Goodman, and more." },
+      { question: "Do you offer maintenance plans?", answer: "Yes. Our annual maintenance plans include two tune-ups per year and priority scheduling for repairs." },
+      { question: "How much does a new furnace cost?", answer: "New furnace installation typically ranges from $3,000-$7,000 depending on size and efficiency. We provide free estimates and financing options." },
+    ],
   },
 };
 
@@ -129,6 +157,7 @@ export function buildProofConfig(input: ProofInput) {
     trustBadges: niche.trustBadges,
     reviews: niche.reviews,
     painPoints: input.pain_points || [],
+    faq: niche.faq || [],
     rep: {
       name: input.rep_name || "",
       bookingLink: input.rep_booking_link || "",
