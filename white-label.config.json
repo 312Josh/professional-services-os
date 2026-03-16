@@ -1,146 +1,118 @@
 {
   "brand": {
-    "companyName": "Apex Plumbing & HVAC",
-    "tagline": "Fast. Reliable. Guaranteed.",
-    "appTitle": "Apex Field Service Ops",
-    "appShortTitle": "Apex Ops",
-    "phone": "(555) 123-4567",
-    "serviceArea": "Chicago Metro Area",
-    "yearsInBusiness": 12,
-    "accentColor": "#0b6a8f",
-    "accentColorMuted": "#2f4758",
+    "companyName": "Mitchell & Associates",
+    "tagline": "Trusted Legal Counsel.",
+    "appTitle": "Mitchell & Associates — Client Portal",
+    "appShortTitle": "Mitchell Law",
+    "phone": "(312) 555-0199",
+    "serviceArea": "Chicago, IL",
+    "yearsInBusiness": 18,
+    "accentColor": "#1e3a5f",
+    "accentColorMuted": "#2c4a6e",
     "successColor": "#0c8d4f",
     "dangerColor": "#b13a3a",
-    "surfaceTintColor": "#eaf6ff",
+    "surfaceTintColor": "#eef3f9",
     "logoUrl": ""
   },
+  "vocabulary": {
+    "lead": "Inquiry",
+    "leads": "Inquiries",
+    "service_request": "Consultation Request",
+    "job": "Engagement",
+    "jobs": "Engagements",
+    "technician": "Attorney",
+    "service_call": "Consultation",
+    "service_area": "Practice Area",
+    "service_areas": "Practice Areas",
+    "job_status": "Matter Status",
+    "job_notes": "Case Notes",
+    "customer": "Client",
+    "customers": "Clients",
+    "book": "Schedule",
+    "booking": "Appointment"
+  },
   "services": [
-    "Plumbing",
-    "HVAC",
-    "Drain Cleaning",
-    "Water Heaters",
-    "Sewer & Water Lines",
-    "Emergency Service"
+    "Family Law",
+    "Estate Planning",
+    "Business Law",
+    "Personal Injury",
+    "Real Estate",
+    "Criminal Defense"
   ],
   "trustBadges": [
-    {
-      "label": "Licensed & Insured",
-      "icon": "\ud83d\udee1\ufe0f"
-    },
-    {
-      "label": "Background Checked",
-      "icon": "\u2705"
-    },
-    {
-      "label": "Satisfaction Guaranteed",
-      "icon": "\u2b50"
-    },
-    {
-      "label": "Up-Front Pricing",
-      "icon": "\ud83d\udcb0"
-    },
-    {
-      "label": "Same-Day Service",
-      "icon": "\u26a1"
-    },
-    {
-      "label": "24/7 Emergency",
-      "icon": "\ud83d\udea8"
-    }
+    { "label": "Bar Admitted", "icon": "⚖️" },
+    { "label": "AV Rated", "icon": "🏆" },
+    { "label": "Super Lawyers", "icon": "⭐" },
+    { "label": "Board Certified", "icon": "🛡️" },
+    { "label": "Free Consultation", "icon": "💬" },
+    { "label": "Confidential", "icon": "🔒" }
   ],
   "reviews": [
     {
-      "name": "Sarah M.",
+      "name": "Maria S.",
       "rating": 5,
-      "text": "Called at 7am with a burst pipe. They were here by 7:30. Fixed it in under an hour. Saved my basement.",
-      "date": "2 weeks ago",
-      "service": "Emergency Plumbing"
-    },
-    {
-      "name": "David K.",
-      "rating": 5,
-      "text": "Best HVAC company I've worked with. Installed a new furnace, explained everything, cleaned up perfectly.",
+      "text": "I was going through a difficult divorce and needed an attorney fast. They responded within 10 minutes and made me feel heard from the first call.",
       "date": "1 month ago",
-      "service": "HVAC Installation"
+      "service": "Family Law"
     },
     {
-      "name": "Jennifer R.",
+      "name": "James W.",
       "rating": 5,
-      "text": "Third time using them. Always on time, always fair pricing. My go-to for anything plumbing.",
+      "text": "Set up our family trust and estate plan. Thorough, patient, and explained everything in plain English. Exactly what we needed.",
       "date": "3 weeks ago",
-      "service": "Drain Cleaning"
+      "service": "Estate Planning"
     },
     {
-      "name": "Mike T.",
-      "rating": 4,
-      "text": "Quick response, professional crew. Fixed our water heater same day. Price was fair.",
-      "date": "1 month ago",
-      "service": "Water Heater Repair"
-    },
-    {
-      "name": "Lisa P.",
+      "name": "Linda C.",
       "rating": 5,
-      "text": "They replaced our entire sewer line. Massive job. Came in on budget and ahead of schedule.",
+      "text": "Handled our business incorporation and operating agreement. Professional, responsive, and finished ahead of schedule.",
       "date": "2 months ago",
-      "service": "Sewer Replacement"
+      "service": "Business Law"
+    },
+    {
+      "name": "Robert K.",
+      "rating": 5,
+      "text": "After my accident, I didn't know where to turn. They took my case on contingency and got me a settlement I never expected.",
+      "date": "1 month ago",
+      "service": "Personal Injury"
+    },
+    {
+      "name": "Angela T.",
+      "rating": 4,
+      "text": "Closed on our first home with zero stress. They caught issues the seller's attorney missed. Worth every penny.",
+      "date": "6 weeks ago",
+      "service": "Real Estate"
     }
   ],
   "operations": {
-    "responseTimeMinutes": 15,
-    "newLeadAlertMinutes": 20,
-    "staleLeadHours": 24,
-    "followUpLeadHours": 48,
-    "defaultLeadValueCents": 65000
-  },
-  "copy": {
-    "loginSubtitle": "Owner login for your operations command center.",
-    "dashboardTitle": "Owner Dashboard",
-    "dashboardSubtitle": "See what needs attention now, where revenue is at risk, and what to do next.",
-    "leadsTitle": "Leads",
-    "leadIntakeCta": "Save Lead to Priority Queue",
-    "leadDefaultSource": "Inbound request"
-  },
-  "payments": {
-    "methods": [
-      "stripe",
-      "zelle",
-      "venmo",
-      "paypal"
-    ],
-    "primaryMethod": "stripe"
-  },
-  "demo": {
-    "adminEmail": "owner@fieldops.local",
-    "adminPassword": "admin123"
+    "responseTimeMinutes": 10,
+    "staleLeadThresholdMinutes": 480,
+    "followUpThresholdMinutes": 240
   },
   "faq": [
     {
-      "question": "How fast do you respond to service calls?",
-      "answer": "We respond within 15 minutes to all service requests. Our technicians are stationed throughout the Chicago Metro Area so we can reach you quickly, even for emergencies."
+      "question": "How quickly will I hear back after contacting your firm?",
+      "answer": "We respond to all consultation requests within 10 minutes during business hours. After hours, you'll receive an automatic confirmation and a callback first thing the next morning."
     },
     {
-      "question": "Are your technicians licensed and insured?",
-      "answer": "Yes. Every technician is fully licensed, insured, and background-checked. We carry general liability and workers compensation insurance for your protection."
+      "question": "Do you offer free consultations?",
+      "answer": "Yes. Your initial consultation is free with no obligation. We'll listen to your situation, explain your options, and give you an honest assessment of your case."
     },
     {
-      "question": "Do you offer free estimates?",
-      "answer": "Yes. We provide free, no-obligation estimates for all services. We give you the price upfront before any work begins \u2014 no surprises."
+      "question": "What practice areas do you cover?",
+      "answer": "Our firm focuses on family law, estate planning, business law, personal injury, real estate, and criminal defense. We serve clients throughout the Chicago metropolitan area."
     },
     {
-      "question": "What areas do you serve?",
-      "answer": "We serve the entire Chicago Metro Area including all surrounding suburbs. Call us to confirm service availability in your specific location."
+      "question": "How are your fees structured?",
+      "answer": "Fee structures vary by practice area. Personal injury cases are handled on contingency (no fee unless we win). Other matters use flat fees or hourly billing, always disclosed upfront before engagement."
     },
     {
-      "question": "Do you offer emergency service?",
-      "answer": "Yes. We offer 24/7 emergency service for plumbing, HVAC, and drain emergencies. Call us anytime \u2014 nights, weekends, and holidays included."
+      "question": "Is my consultation confidential?",
+      "answer": "Absolutely. All communications with our firm are protected by attorney-client privilege from the moment you contact us."
     },
     {
-      "question": "What payment methods do you accept?",
-      "answer": "We accept all major credit cards, checks, Zelle, Venmo, and PayPal. Financing options are available for larger projects."
-    },
-    {
-      "question": "Do you guarantee your work?",
-      "answer": "Yes. All of our work comes with a satisfaction guarantee. If something is not right, we will make it right at no additional cost."
+      "question": "Can I schedule a consultation online?",
+      "answer": "Yes. You can book a consultation directly from our website 24/7. Choose a time that works for you and receive instant confirmation."
     }
   ],
   "sticky": {
@@ -151,7 +123,30 @@
     "showCompetitorComparison": true,
     "showWeeklyDigest": true,
     "showReviewToast": true,
-    "industryAvgResponseHours": 47,
+    "industryAvgResponseHours": 72,
     "missedLeadThresholdMinutes": 120
+  },
+  "copy": {
+    "dashboardTitle": "Firm Dashboard",
+    "dashboardSubtitle": "Inquiries, engagements, and billing at a glance.",
+    "dashboardLeadAlertTitle": "New inquiry urgency",
+    "dashboardLeadAlertSubtitle": "Respond to build client trust.",
+    "loginSubtitle": "Attorney portal for your firm.",
+    "invoicePaymentModeLabel": "Payment terms:"
+  },
+  "payments": {
+    "defaultEnabledMethodsCsv": "stripe,paypal",
+    "defaultPrimaryMethod": "stripe",
+    "destinationDefaults": {
+      "zelleRecipient": "billing@mitchelllaw.com",
+      "venmoHandle": "mitchelllaw",
+      "paypalHandle": "mitchelllaw",
+      "fallbackBaseUrl": "https://professional-services-os.vercel.app"
+    }
+  },
+  "demo": {
+    "loginEmail": "partner@mitchelllaw.com",
+    "loginPassword": "admin123",
+    "loginHint": "Demo: partner@mitchelllaw.com / admin123"
   }
 }

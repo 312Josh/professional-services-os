@@ -7,7 +7,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["plumbing_os"]
+  schemas  = ["professional_services"]
 }
 
 model Admin {
@@ -19,7 +19,7 @@ model Admin {
   sessions     Session[]
   activities   Activity[]
 
-  @@schema("plumbing_os")
+  @@schema("professional_services")
 }
 
 model Session {
@@ -30,7 +30,7 @@ model Session {
   createdAt DateTime @default(now())
   admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
 
-  @@schema("plumbing_os")
+  @@schema("professional_services")
 }
 
 model Lead {
@@ -50,7 +50,7 @@ model Lead {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
-  @@schema("plumbing_os")
+  @@schema("professional_services")
 }
 
 model Customer {
@@ -66,7 +66,7 @@ model Customer {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
-  @@schema("plumbing_os")
+  @@schema("professional_services")
 }
 
 model Job {
@@ -84,7 +84,7 @@ model Job {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  @@schema("plumbing_os")
+  @@schema("professional_services")
 }
 
 model Invoice {
@@ -108,7 +108,7 @@ model Invoice {
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
 
-  @@schema("plumbing_os")
+  @@schema("professional_services")
 }
 
 model InvoiceLineItem {
@@ -120,7 +120,7 @@ model InvoiceLineItem {
   lineTotalCents Int
   invoice        Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
-  @@schema("plumbing_os")
+  @@schema("professional_services")
 }
 
 model Activity {
@@ -139,7 +139,7 @@ model Activity {
   invoice    Invoice?  @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
   createdAt  DateTime  @default(now())
 
-  @@schema("plumbing_os")
+  @@schema("professional_services")
 }
 
 model ProofAsset {
@@ -164,5 +164,5 @@ model ProofAsset {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  @@schema("plumbing_os")
+  @@schema("professional_services")
 }

@@ -1,223 +1,118 @@
-const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
-const businessName = (process.env.BUSINESS_NAME || "Apex Field Services").trim() || "Apex Field Services";
-const demoAdminEmail = (process.env.DEMO_ADMIN_EMAIL || "owner@fieldops.local").trim() || "owner@fieldops.local";
-const demoAdminPassword = (process.env.DEMO_ADMIN_PASSWORD || "admin123").trim() || "admin123";
-
-function toCents(value) {
-  return Math.round(value * 100);
-}
 
 async function main() {
-  const now = new Date();
-  const staleLeadCreatedAt = new Date(now.getTime() - 30 * 60 * 60 * 1000);
-  const responseLateLeadCreatedAt = new Date(now.getTime() - 2 * 60 * 60 * 1000);
-  const freshLeadCreatedAt = new Date(now.getTime() - 8 * 60 * 1000);
-  const followUpLeadCreatedAt = new Date(now.getTime() - 72 * 60 * 60 * 1000);
-  const followUpLeadTouchedAt = new Date(now.getTime() - 54 * 60 * 60 * 1000);
-
-  const passwordHash = await bcrypt.hash(demoAdminPassword, 10);
-
+  // Clean existing data
   await prisma.activity.deleteMany();
   await prisma.invoiceLineItem.deleteMany();
   await prisma.invoice.deleteMany();
   await prisma.job.deleteMany();
   await prisma.lead.deleteMany();
-  await prisma.customer.deleteMany();
   await prisma.session.deleteMany();
+  await prisma.customer.deleteMany();
+  await prisma.admin.deleteMany();
 
-  const admin = await prisma.admin.upsert({
-    where: { email: demoAdminEmail },
-    create: {
-      email: demoAdminEmail,
-      name: "Shop Admin",
+  const passwordHash = await bcrypt.hash("admin123", 10);
+
+  const admin = await prisma.admin.create({
+    data: {
+      email: "partner@mitchelllaw.com",
+      name: "Sarah Mitchell",
       passwordHash,
     },
-    update: {
-      name: "Shop Admin",
-      passwordHash,
-    },
   });
 
-  const leadA = await prisma.lead.create({
-    data: {
-      name: "Alice Johnson",
-      phone: "(555) 200-1001",
-      email: "alice@example.com",
-      address: "101 Main St",
-      source: "Google",
-      serviceRequested: "Water heater replacement",
-      status: "new",
-      createdAt: staleLeadCreatedAt,
-      updatedAt: staleLeadCreatedAt,
-    },
+  // Inquiries (leads)
+  const now = new Date();
+  const hoursAgo = (h) => new Date(now.getTime() - h * 60 * 60 * 1000);
+  const daysAgo = (d) => new Date(now.getTime() - d * 24 * 60 * 60 * 1000);
+
+  const leads = await Promise.all([
+    prisma.lead.create({ data: { name: "Maria Santos", email: "maria@example.com", phone: "(312) 555-0201", serviceRequested: "Divorce consultation", source: "website", status: "new", createdAt: hoursAgo(1) } }),
+    prisma.lead.create({ data: { name: "James Wilson", email: "james@example.com", phone: "(312) 555-0202", serviceRequested: "Estate planning", source: "referral", status: "contacted", createdAt: daysAgo(2) } }),
+    prisma.lead.create({ data: { name: "Linda Chen", email: "linda@example.com", phone: "(312) 555-0203", serviceRequested: "Business incorporation", source: "website", status: "new", createdAt: hoursAgo(3) } }),
+    prisma.lead.create({ data: { name: "Robert Kim", email: "robert@example.com", phone: "(312) 555-0204", serviceRequested: "Personal injury consultation", source: "phone", status: "new", createdAt: hoursAgo(5) } }),
+    prisma.lead.create({ data: { name: "Angela Torres", email: "angela@example.com", phone: "(312) 555-0205", serviceRequested: "Real estate closing", source: "website", status: "contacted", createdAt: daysAgo(3) } }),
+  ]);
+
+  // Clients (customers)
+  const client1 = await prisma.customer.create({
+    data: { name: "David Park", email: "david@example.com", phone: "(312) 555-0210", address: "456 Oak Ave, Naperville, IL 60540" },
   });
 
-  const leadB = await prisma.lead.create({
-    data: {
-      name: "Bob Martinez",
-      phone: "(555) 200-1002",
-      email: "bob@example.com",
-      address: "22 Oak Ave",
-      source: "Referral",
-      serviceRequested: "Drain cleaning",
-      status: "contacted",
-      createdAt: followUpLeadCreatedAt,
-      updatedAt: followUpLeadTouchedAt,
-    },
+  const client2 = await prisma.customer.create({
+    data: { name: "Jennifer Ross", email: "jennifer@example.com", phone: "(312) 555-0211", address: "789 Elm St, Schaumburg, IL 60173" },
   });
 
-  await prisma.lead.create({
-    data: {
-      name: "Derek Fields",
-      phone: "(555) 200-1104",
-      email: "derek@example.com",
-      address: "88 Cedar Way",
-      source: "Website",
-      serviceRequested: "Panel upgrade estimate",
-      status: "new",
-      createdAt: responseLateLeadCreatedAt,
-      updatedAt: responseLateLeadCreatedAt,
-    },
-  });
+  // Convert one lead
+  await prisma.lead.update({ where: { id: leads[1].id }, data: { status: "converted", convertedCustomerId: client1.id } });
 
-  await prisma.lead.create({
+  // Engagements (jobs)
+  const engagement1 = await prisma.job.create({
     data: {
-      name: "Evelyn Carter",
-      phone: "(555) 200-1105",
-      email: "evelyn@example.com",
-      address: "17 Willow Ct",
-      source: "LSA",
-      serviceRequested: "No-heat emergency",
-      status: "new",
-      createdAt: freshLeadCreatedAt,
-      updatedAt: freshLeadCreatedAt,
-    },
-  });
-
-  const customer = await prisma.customer.create({
-    data: {
-      name: "Carla Nguyen",
-      phone: "(555) 200-1003",
-      email: "carla@example.com",
-      address: "304 Pine Rd",
-    },
-  });
-
-  await prisma.lead.create({
-    data: {
-      name: "Carla Nguyen",
-      phone: "(555) 200-1003",
-      email: "carla@example.com",
-      address: "304 Pine Rd",
-      source: "Website",
-      serviceRequested: "Leak under kitchen sink",
-      status: "converted",
-      convertedCustomerId: customer.id,
-    },
-  });
-
-  const job = await prisma.job.create({
-    data: {
-      title: "Kitchen sink leak repair",
-      description: "Replace worn P-trap and test all joints.",
-      serviceDate: new Date(),
+      title: "Estate Planning — Park Family Trust",
+      description: "Revocable living trust, pour-over will, power of attorney, healthcare directive",
+      serviceDate: daysAgo(-2),
       status: "in_progress",
-      customerId: customer.id,
-      leadId: leadB.id,
+      customerId: client1.id,
+      leadId: leads[1].id,
     },
   });
 
-  const subtotalCents = toCents(220);
-  const taxCents = toCents(17.6);
-  const totalCents = subtotalCents + taxCents;
+  const engagement2 = await prisma.job.create({
+    data: {
+      title: "Residential Real Estate Closing",
+      description: "Buyer representation, title review, closing documentation",
+      serviceDate: daysAgo(-14),
+      status: "scheduled",
+      customerId: client2.id,
+    },
+  });
 
+  // Invoice
   const invoice = await prisma.invoice.create({
     data: {
-      invoiceNumber: "INV-DEMO-1001",
-      customerId: customer.id,
-      jobId: job.id,
+      invoiceNumber: "INV-2026-001",
+      issueDate: daysAgo(5),
+      dueDate: daysAgo(-25),
+      totalCents: 350000,
       status: "sent",
-      issueDate: new Date(),
-      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      subtotalCents,
-      taxCents,
-      totalCents,
-      paymentMethod: "stripe",
-      paymentLink: "https://payments.example.com/pay/inv-demo-1001",
-      notes: `Thank you for choosing ${businessName}.`,
-      lineItems: {
-        create: [
-          {
-            description: "Service call",
-            quantity: 1,
-            unitPriceCents: toCents(95),
-            lineTotalCents: toCents(95),
-          },
-          {
-            description: "Pipe parts and fittings",
-            quantity: 1,
-            unitPriceCents: toCents(65),
-            lineTotalCents: toCents(65),
-          },
-          {
-            description: "Labor (1 hour)",
-            quantity: 1,
-            unitPriceCents: toCents(60),
-            lineTotalCents: toCents(60),
-          },
-        ],
-      },
+      customerId: client1.id,
+      jobId: engagement1.id,
     },
   });
 
-  await prisma.activity.createMany({
-    data: [
-      {
-        type: "created",
-        message: "Seeded lead Alice Johnson",
-        adminId: admin.id,
-        leadId: leadA.id,
-      },
-      {
-        type: "created",
-        message: "Seeded lead Bob Martinez",
-        adminId: admin.id,
-        leadId: leadB.id,
-      },
-      {
-        type: "conversion",
-        message: "Lead converted to customer Carla Nguyen",
-        adminId: admin.id,
-        customerId: customer.id,
-      },
-      {
-        type: "created",
-        message: "Seeded job Kitchen sink leak repair",
-        adminId: admin.id,
-        customerId: customer.id,
-        jobId: job.id,
-      },
-      {
-        type: "email_sent",
-        message: "Seeded invoice email marked as sent",
-        adminId: admin.id,
-        customerId: customer.id,
-        invoiceId: invoice.id,
-      },
-    ],
+  await prisma.invoiceLineItem.create({
+    data: {
+      description: "Estate Planning — Trust Document Preparation",
+      quantity: 1,
+      unitPriceCents: 250000,
+      lineTotalCents: 250000,
+      invoiceId: invoice.id,
+    },
   });
 
-  console.log(`Seed complete. Login: ${demoAdminEmail} / ${demoAdminPassword}`);
+  await prisma.invoiceLineItem.create({
+    data: {
+      description: "Power of Attorney & Healthcare Directive",
+      quantity: 1,
+      unitPriceCents: 100000,
+      lineTotalCents: 100000,
+      invoiceId: invoice.id,
+    },
+  });
+
+  // Activities
+  await prisma.activity.create({ data: { type: "lead_created", message: "New inquiry: Maria Santos — Divorce consultation", adminId: admin.id, leadId: leads[0].id } });
+  await prisma.activity.create({ data: { type: "lead_contacted", message: "Responded to James Wilson — Estate planning inquiry", adminId: admin.id, leadId: leads[1].id } });
+  await prisma.activity.create({ data: { type: "note", message: "Initial consultation completed. Client retained for estate planning.", adminId: admin.id, customerId: client1.id } });
+  await prisma.activity.create({ data: { type: "invoice_sent", message: "Invoice INV-2026-001 sent to David Park — $3,500.00", adminId: admin.id, invoiceId: invoice.id } });
+
+  console.log("Seed complete. Login: partner@mitchelllaw.com / admin123");
 }
 
 main()
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch((e) => { console.error(e); process.exit(1); })
+  .finally(() => prisma.$disconnect());
