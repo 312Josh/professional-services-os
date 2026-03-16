@@ -368,6 +368,7 @@ export async function updateLeadStatusAction(formData: FormData): Promise<void> 
 export async function convertLeadToCustomerAction(formData: FormData): Promise<void> {
   const admin = await requireAdmin();
   const leadId = asString(formData, "leadId");
+  const bookJob = asString(formData, "bookJob") === "1";
 
   const lead = await prisma.lead.findUnique({ where: { id: leadId } });
   if (!lead) {
@@ -376,6 +377,7 @@ export async function convertLeadToCustomerAction(formData: FormData): Promise<v
 
   if (lead.convertedCustomerId) {
     revalidateDashboardPaths();
+    if (bookJob) redirect(`/customers/${lead.convertedCustomerId}#book-job`);
     return;
   }
 
@@ -405,6 +407,7 @@ export async function convertLeadToCustomerAction(formData: FormData): Promise<v
   });
 
   revalidateDashboardPaths();
+  if (bookJob) redirect(`/customers/${customer.id}#book-job`);
 }
 
 export async function addLeadNoteAction(formData: FormData): Promise<void> {

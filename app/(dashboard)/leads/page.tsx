@@ -307,12 +307,22 @@ export default async function LeadsPage() {
                           </button>
                         </form>
 
-                        {lead.convertedCustomerId ? null : (
-                          <form method="post" action={`/api/leads/${lead.id}/convert`}>
-                            <button type="submit" className="success">
-                              Convert to Customer
-                            </button>
-                          </form>
+                        {lead.convertedCustomerId ? (
+                          <a href={`/customers/${lead.convertedCustomerId}`} className="secondary">View Customer</a>
+                        ) : (
+                          <>
+                            <form method="post" action={`/api/leads/${lead.id}/convert`}>
+                              <button type="submit" className="success">
+                                Convert to Customer
+                              </button>
+                            </form>
+                            <form method="post" action={`/api/leads/${lead.id}/convert`}>
+                              <input type="hidden" name="bookJob" value="1" />
+                              <button type="submit" className="success">
+                                Convert &amp; Book Job
+                              </button>
+                            </form>
+                          </>
                         )}
 
                         <form method="post" action={`/api/leads/${lead.id}/notes`}>
