@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { INVOICE_STATUSES, INVOICE_STATUS_LABELS } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 

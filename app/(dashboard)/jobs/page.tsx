@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getJobStatusLabel, JOB_SOURCE_LEAD_STATUSES, JOB_STATUSES, JOB_STATUS_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import { prisma } from "@/lib/prisma";

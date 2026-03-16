@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { appConfig } from "@/lib/app-config";
 import { getLeadStatusLabel, LEAD_STATUSES, LEAD_STATUS_LABELS } from "@/lib/constants";
 import {

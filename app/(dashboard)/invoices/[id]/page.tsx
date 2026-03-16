@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getActivityTypeLabel, getInvoiceStatusLabel, INVOICE_STATUSES, INVOICE_STATUS_LABELS } from "@/lib/constants";
 import { appConfig } from "@/lib/app-config";
 import { formatCurrency, formatDate } from "@/lib/format";

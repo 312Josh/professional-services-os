@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { appConfig } from "@/lib/app-config";
 import { getActivityTypeLabel } from "@/lib/constants";
