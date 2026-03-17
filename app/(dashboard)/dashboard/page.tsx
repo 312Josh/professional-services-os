@@ -223,7 +223,8 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="grid two" style={{ marginTop: "1.5rem" }}>
+      {/* Do Next actions */}
+      <div style={{ marginTop: "1.5rem" }}>
         <section className="card">
           <h2>Do Next</h2>
           <div className="owner-action-list">
@@ -234,27 +235,6 @@ export default async function DashboardPage() {
               </Link>
             ))}
           </div>
-        </section>
-
-        <section className="card">
-          <h2>{appConfig.copy.trustLayerTitle}</h2>
-          <p className="badge owner-trust-badge">{trustModeLabel}</p>
-          <p className={`notice ${trustModeAligned ? "success" : "warning"}`} style={{ marginBottom: "0.7rem" }}>
-            {trustRecommendationText}
-          </p>
-          <p className="muted">{trustDecisionSummary}</p>
-          {appConfig.trustLayer.mode === "minimal" ? (
-            <>
-              <p className="muted">{appConfig.copy.trustLayerMinimalSummary}</p>
-              <ul className="owner-bullet-list">
-                {appConfig.trustLayer.proofPoints.map((point) => (
-                  <li key={point}>{point}</li>
-                ))}
-              </ul>
-            </>
-          ) : (
-            <p className="muted">{appConfig.copy.trustLayerDeferredSummary}</p>
-          )}
         </section>
       </div>
 
@@ -357,45 +337,6 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        <section className="card">
-          <h2>Lead Leakage Watchlist</h2>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Issue</th>
-                  <th>Service</th>
-                  <th>At risk</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leadLeakageQueue.length === 0 ? (
-                  <tr>
-                    <td colSpan={4}>No stale/follow-up lead leakage detected.</td>
-                  </tr>
-                ) : (
-                  leadLeakageQueue.map((lead) => (
-                    <tr key={lead.id}>
-                      <td>
-                        <strong>{lead.name}</strong>
-                        <div className="muted">{getLeadStatusLabel(lead.status)}</div>
-                      </td>
-                      <td>
-                        {lead.isStale ? "Stale new lead" : "Follow-up needed"}
-                        <div className="muted">
-                          Created {formatMinutesAgo(lead.ageMinutes)}; touched {formatMinutesAgo(lead.lastTouchedMinutes)}
-                        </div>
-                      </td>
-                      <td>{lead.serviceRequested || "-"}</td>
-                      <td>{formatCurrency(lead.riskRevenueCents)}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
       </div>
 
       {(leadSummary.staleCount > 0 || leadSummary.followUpNeededCount > 0) && (
@@ -457,41 +398,8 @@ export default async function DashboardPage() {
         </section>
       )}
 
-      <div className="grid two" style={{ marginTop: "1.5rem" }}>
-        <section className="card">
-          <h2>What Got Booked</h2>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Job</th>
-                  <th>Customer</th>
-                  <th>Booked</th>
-                  <th>Source</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentlyBookedJobs.length === 0 ? (
-                  <tr>
-                    <td colSpan={4}>No jobs booked in the last 7 days.</td>
-                  </tr>
-                ) : (
-                  recentlyBookedJobs.map((job) => (
-                    <tr key={job.id}>
-                      <td>
-                        <strong>{job.title}</strong>
-                      </td>
-                      <td>{job.customer.name}</td>
-                      <td>{formatDate(job.createdAt)}</td>
-                      <td>{job.lead ? job.lead.name : "Direct/customer repeat"}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
+      {/* Recent Lead Flow — compact */}
+      <div style={{ marginTop: "1.5rem" }}>
         <section className="card">
           <h2>Recent Lead Flow</h2>
           <div className="table-wrap">
@@ -516,11 +424,7 @@ export default async function DashboardPage() {
               </tbody>
             </table>
           </div>
-          <p className="muted" style={{ marginTop: "0.8rem" }}>
-            Last 5 invoices created:
-            {" "}
-            {recentInvoices.map((invoice) => invoice.invoiceNumber).join(", ")}
-          </p>
+
         </section>
       </div>
 
@@ -539,10 +443,7 @@ export default async function DashboardPage() {
         </section>
       </div>
 
-      {/* Weekly Digest */}
-      <div style={{ marginTop: "1.5rem" }}>
-        <WeeklyDigest data={demoDigest} />
-      </div>
+      {/* Weekly digest condensed into hero metrics above */}
 
       {/* Lead Response Automation → moved to /lead-response */}
 
