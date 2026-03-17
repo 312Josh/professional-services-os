@@ -47,6 +47,7 @@ model Lead {
   convertedCustomer   Customer? @relation("LeadConvertedCustomer", fields: [convertedCustomerId], references: [id])
   jobs                Job[]
   activities          Activity[]
+  smsLogs             SmsLog[]
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
@@ -163,6 +164,21 @@ model ProofAsset {
   generatedAt   DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@schema("professional_services")
+}
+
+model SmsLog {
+  id                String   @id @default(cuid())
+  leadId            String?
+  lead              Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  direction         String
+  fromNumber        String
+  toNumber          String
+  body              String
+  providerMessageId String?
+  provider          String   @default("twilio")
+  createdAt         DateTime @default(now())
 
   @@schema("professional_services")
 }

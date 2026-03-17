@@ -20,6 +20,7 @@ export default async function ActivityPage() {
     invoice_sent: "bg-amber-50 text-amber-700 border-amber-200",
     invoice_paid: "bg-green-50 text-green-700 border-green-200",
     status_change: "bg-violet-50 text-violet-700 border-violet-200",
+    sms_reply: "bg-cyan-50 text-cyan-700 border-cyan-200",
   };
 
   return (
