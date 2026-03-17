@@ -8,6 +8,7 @@ import { LiveToast } from "@/components/live-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { BookingModal } from "@/components/booking-modal";
 
 const BRAND = {
   name: "Mitchell & Associates",
@@ -125,12 +126,12 @@ export default function HomePage() {
             </motion.div>
 
             <motion.div custom={4} variants={fadeUp} className="mt-10 flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="bg-amber-500 hover:bg-amber-400 text-[#0f1f35] font-bold text-base px-8 h-14 rounded-full shadow-lg shadow-amber-500/20 hover:shadow-amber-400/30 hover:scale-[1.02] transition-all">
-                <Link href="/request">
+              <BookingModal trigger={
+                <Button size="lg" className="bg-amber-500 hover:bg-amber-400 text-[#0f1f35] font-bold text-base px-8 h-14 rounded-full shadow-lg shadow-amber-500/20 hover:shadow-amber-400/30 hover:scale-[1.02] transition-all">
+                  <CalendarCheck className="w-5 h-5 mr-2" />
                   Schedule Free Consultation
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
+                </Button>
+              } brandColor="#1e3a5f" />
               <Button asChild variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10 font-medium text-base px-8 h-14 rounded-full">
                 <a href="#how">See How It Works <ChevronRight className="w-4 h-4 ml-1" /></a>
               </Button>
