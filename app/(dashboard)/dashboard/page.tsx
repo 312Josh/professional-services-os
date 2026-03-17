@@ -32,7 +32,7 @@ import {
   getDemoCompetitorComparison,
   getDemoWeeklyDigest
 } from "@/lib/sticky-demo";
-import { ResponseCadencePanel } from "@/app/(dashboard)/_components/response-cadence";
+// ResponseCadencePanel moved to /lead-response page
 import { SpeedToLeadHero } from "@/app/(dashboard)/_components/speed-to-lead-hero";
 
 export default async function DashboardPage() {
@@ -544,10 +544,7 @@ export default async function DashboardPage() {
         <WeeklyDigest data={demoDigest} />
       </div>
 
-      {/* Lead Response Automation Timeline */}
-      <div style={{ marginTop: "1.5rem" }}>
-        <ResponseCadencePanel />
-      </div>
+      {/* Lead Response Automation → moved to /lead-response */}
 
       {/* Review notification toast (shows most recent simulated review) */}
       {demoFeed.find((f) => f.type === "review") && (

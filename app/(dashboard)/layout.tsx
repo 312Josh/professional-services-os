@@ -2,7 +2,7 @@ import Link from "next/link";
 import { appConfig } from "@/lib/app-config";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LayoutDashboard, Users, Briefcase, FileText, Clock, UserCircle, LogOut, Zap, Scale } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, FileText, Clock, UserCircle, LogOut, Zap, Radio, Scale } from "lucide-react";
 import { MobileMenuButton } from "@/app/(dashboard)/_components/mobile-nav";
 import { ChannelStatusBar } from "@/app/(dashboard)/_components/channel-status";
 
@@ -12,6 +12,7 @@ const navItems = [
   { href: "/customers", label: "Clients", icon: Users },
   { href: "/jobs", label: "Engagements", icon: Briefcase },
   { href: "/invoices", label: "Invoices", icon: FileText },
+  { href: "/lead-response", label: "Lead Response", icon: Radio },
   { href: "/activity", label: "Activity", icon: Clock },
 ];
 
@@ -28,8 +29,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         {/* Brand */}
         <div className="p-5 border-b border-white/5">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-400 flex items-center justify-center">
-              <Zap className="w-4 h-4 text-brand-slate" />
+            <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-[#0f1f35]" />
             </div>
             <div>
               <h2 className="font-display text-sm font-bold tracking-tight">{appConfig.brand.appShortTitle}</h2>
