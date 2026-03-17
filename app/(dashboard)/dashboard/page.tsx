@@ -32,6 +32,7 @@ import {
   getDemoCompetitorComparison,
   getDemoWeeklyDigest
 } from "@/lib/sticky-demo";
+import { ResponseCadencePanel } from "@/app/(dashboard)/_components/response-cadence";
 
 export default async function DashboardPage() {
   const now = new Date();
@@ -176,7 +177,7 @@ export default async function DashboardPage() {
         ctaLabel="Open Lead Queue"
       />
 
-      <div className="grid four" style={{ marginBottom: "1rem" }}>
+      <div className="grid four" style={{ marginBottom: "1.5rem", marginTop: "1.5rem" }}>
         <OwnerMetricCard
           title="New leads"
           value={String(leadSummary.newUnworkedCount)}
@@ -211,7 +212,7 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="grid two">
+      <div className="grid two" style={{ marginTop: "1.5rem" }}>
         <section className="card">
           <h2>Do Next</h2>
           <div className="owner-action-list">
@@ -246,7 +247,7 @@ export default async function DashboardPage() {
         </section>
       </div>
 
-      <div className="grid two" style={{ marginTop: "1rem" }}>
+      <div className="grid two" style={{ marginTop: "1.5rem" }}>
         <section className="card">
           <h2>{appConfig.copy.dashboardFirstTouchTitle}</h2>
           <p className="muted">{appConfig.copy.dashboardFirstTouchSubtitle}</p>
@@ -387,7 +388,7 @@ export default async function DashboardPage() {
       </div>
 
       {(leadSummary.staleCount > 0 || leadSummary.followUpNeededCount > 0) && (
-        <section className="card" style={{ marginTop: "1rem", borderLeft: "4px solid var(--danger)" }}>
+        <section className="card" style={{ marginTop: "1.5rem", borderLeft: "4px solid var(--danger)" }}>
           <h2>⚠️ Missed Leads — Needs Rescue</h2>
           <p className="muted">These leads went cold. Every hour without contact drops conversion probability.</p>
           <div className="table-wrap">
@@ -445,7 +446,7 @@ export default async function DashboardPage() {
         </section>
       )}
 
-      <div className="grid two" style={{ marginTop: "1rem" }}>
+      <div className="grid two" style={{ marginTop: "1.5rem" }}>
         <section className="card">
           <h2>What Got Booked</h2>
           <div className="table-wrap">
@@ -513,7 +514,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Sticky engagement widgets */}
-      <div className="grid two" style={{ marginTop: "1rem" }}>
+      <div className="grid two" style={{ marginTop: "1.5rem" }}>
         {/* Response Time + Competitor Comparison */}
         <div className="grid" style={{ gap: "1rem" }}>
           <ResponseTimeCard avg={demoResponse.avg} trend={demoResponse.trend} prevAvg={demoResponse.prevAvg} />
@@ -528,8 +529,13 @@ export default async function DashboardPage() {
       </div>
 
       {/* Weekly Digest */}
-      <div style={{ marginTop: "1rem" }}>
+      <div style={{ marginTop: "1.5rem" }}>
         <WeeklyDigest data={demoDigest} />
+      </div>
+
+      {/* Lead Response Automation Timeline */}
+      <div style={{ marginTop: "1.5rem" }}>
+        <ResponseCadencePanel />
       </div>
 
       {/* Review notification toast (shows most recent simulated review) */}

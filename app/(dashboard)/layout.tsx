@@ -2,7 +2,8 @@ import Link from "next/link";
 import { appConfig } from "@/lib/app-config";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LayoutDashboard, Users, Briefcase, FileText, Clock, UserCircle, LogOut, Scale } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, FileText, Clock, UserCircle, LogOut, Zap, Scale } from "lucide-react";
+import { MobileMenuButton } from "@/app/(dashboard)/_components/mobile-nav";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -21,13 +22,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
     prisma.lead.count({ where: { status: "new", createdAt: { gte: freshLeadSince } } }),
   ]);
 
-  return (
-    <div className="min-h-screen bg-slate-50 lg:grid lg:grid-cols-[240px_1fr]">
-      <aside className="bg-[#0f1f35] text-white border-r border-white/5 flex flex-col">
+  const sidebarContent = (
+    <aside className="bg-[#0f1f35] text-white border-r border-white/5 flex flex-col h-full min-h-screen">
+        {/* Brand */}
         <div className="p-5 border-b border-white/5">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-amber-400 flex items-center justify-center">
-              <Scale className="w-4 h-4 text-[#0f1f35]" />
+              <Zap className="w-4 h-4 text-[#0f1f35]" />
             </div>
             <div>
               <h2 className="font-display text-sm font-bold tracking-tight">{appConfig.brand.appShortTitle}</h2>
@@ -36,9 +37,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </div>
 
+        {/* Nav */}
         <nav className="flex-1 p-3 space-y-0.5 flex flex-row lg:flex-col flex-wrap lg:flex-nowrap gap-0.5">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/10 transition-colors group">
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/10 transition-colors group"
+            >
               <span className="flex items-center gap-2.5">
                 <item.icon className="w-4 h-4 text-slate-500 group-hover:text-amber-300 transition-colors" />
                 {item.label}
@@ -52,6 +58,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           ))}
         </nav>
 
+        {/* User + Logout */}
         <div className="p-4 border-t border-white/5">
           <div className="flex items-center gap-2.5 mb-3">
             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
@@ -63,18 +70,41 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
           </div>
           <form method="post" action="/api/logout">
-            <button type="submit" className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/10 transition-colors border border-white/5 cursor-pointer">
-              <LogOut className="w-3.5 h-3.5" /> Sign Out
+            <button
+              type="submit"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/10 transition-colors border border-white/5 cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Sign Out
             </button>
           </form>
         </div>
 
+        {/* Powered by */}
         <div className="px-4 pb-3">
-          <p className="text-[10px] text-slate-600 text-center">Powered by <a href="https://cogrow.ai" className="text-slate-500 hover:text-amber-300 transition-colors">CoGrow</a></p>
+          <p className="text-[10px] text-slate-600 text-center">
+            Powered by <a href="https://cogrow.ai" className="text-slate-500 hover:text-amber-400 transition-colors">CoGrow</a>
+          </p>
         </div>
       </aside>
+  );
 
-      <main className="p-4 lg:p-6 overflow-x-hidden">{children}</main>
+  return (
+    <div className="min-h-screen bg-slate-50 lg:grid lg:grid-cols-[240px_1fr]">
+      {/* Desktop sidebar */}
+      <div className="hidden lg:block">
+        {sidebarContent}
+      </div>
+
+      {/* Mobile hamburger + drawer */}
+      <MobileMenuButton>
+        {sidebarContent}
+      </MobileMenuButton>
+
+      {/* Main content */}
+      <main className="p-4 lg:p-6 overflow-x-hidden pt-16 lg:pt-6">
+        {children}
+      </main>
     </div>
   );
 }
