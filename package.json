@@ -9,7 +9,9 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.js",
+    "sync-env": "node scripts/sync-env.js",
+    "prebuild": "node scripts/sync-env.js"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",

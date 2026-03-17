@@ -9,14 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { BookingModal } from "@/components/booking-modal";
+import { getBrand } from "@/lib/brand-client";
 
-const BRAND = {
-  name: "Mitchell & Associates",
-  phone: "(312) 555-0199",
-  area: "Chicago, IL",
-  years: 18,
-  responseMin: 10,
-};
+// BRAND is now read from NEXT_PUBLIC_ env vars (generated from white-label.config.json)
+// Fallbacks are in getBrand() for safety
 
 const PRACTICE_AREAS = [
   { name: "Family Law", icon: Users },
@@ -76,6 +72,8 @@ function Stars({ count }: { count: number }) {
 }
 
 export default function HomePage() {
+  const BRAND = getBrand();
+
   return (
     <div className="grain min-h-screen bg-white">
       <LiveToast />
