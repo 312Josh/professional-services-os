@@ -1,8 +1,10 @@
 export const dynamic = "force-dynamic";
+import React from "react";
 import { getJobStatusLabel, JOB_SOURCE_LEAD_STATUSES, JOB_STATUSES, JOB_STATUS_LABELS } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { Briefcase, ArrowRight } from "lucide-react";
+import { ReviewRequestButton } from "@/app/(dashboard)/_components/review-request";
 
 export default async function JobsPage() {
   const [jobs, customers, leads] = await Promise.all([
@@ -85,7 +87,8 @@ export default async function JobsPage() {
             </thead>
             <tbody>
               {jobs.map((job) => (
-                <tr key={job.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                <React.Fragment key={job.id}>
+                <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                   <td className="py-3 pl-5 lg:pl-6 pr-3">
                     <p className="font-semibold text-slate-900 text-[13px]">{job.title}</p>
                     {job.description && <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{job.description}</p>}
@@ -106,6 +109,19 @@ export default async function JobsPage() {
                     </form>
                   </td>
                 </tr>
+                {job.status === "completed" && (
+                  <tr>
+                    <td colSpan={5} className="px-5 lg:px-6 py-3 bg-amber-50/30">
+                      <ReviewRequestButton
+                        jobId={job.id}
+                        jobTitle={job.title}
+                        customerName={job.customer.name}
+                        customerPhone={job.customer.phone}
+                      />
+                    </td>
+                  </tr>
+                )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>

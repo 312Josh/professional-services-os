@@ -33,6 +33,7 @@ import {
   getDemoWeeklyDigest
 } from "@/lib/sticky-demo";
 import { ResponseCadencePanel } from "@/app/(dashboard)/_components/response-cadence";
+import { SpeedToLeadHero } from "@/app/(dashboard)/_components/speed-to-lead-hero";
 
 export default async function DashboardPage() {
   const now = new Date();
@@ -152,6 +153,16 @@ export default async function DashboardPage() {
 
   return (
     <>
+      {/* Speed-to-Lead Hero */}
+      <SpeedToLeadHero
+        avgResponseMinutes={demoResponse.avg}
+        avgResponseSeconds={Math.floor(Math.random() * 59)}
+        todayResponseRate={Math.min(100, Math.floor(100 - demoMissed * 15))}
+        missedLeadsToday={demoMissed}
+        leadsReceivedToday={demoLeadCount}
+        leadsRespondedToday={demoLeadCount - demoMissed}
+      />
+
       {/* Sticky: Lead notification bar */}
       <LeadNotificationBar
         count={demoLeadCount}

@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LayoutDashboard, Users, Briefcase, FileText, Clock, UserCircle, LogOut, Zap, Scale } from "lucide-react";
 import { MobileMenuButton } from "@/app/(dashboard)/_components/mobile-nav";
+import { ChannelStatusBar } from "@/app/(dashboard)/_components/channel-status";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -28,7 +29,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div className="p-5 border-b border-white/5">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-amber-400 flex items-center justify-center">
-              <Zap className="w-4 h-4 text-[#0f1f35]" />
+              <Zap className="w-4 h-4 text-brand-slate" />
             </div>
             <div>
               <h2 className="font-display text-sm font-bold tracking-tight">{appConfig.brand.appShortTitle}</h2>
@@ -46,7 +47,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               className="flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/10 transition-colors group"
             >
               <span className="flex items-center gap-2.5">
-                <item.icon className="w-4 h-4 text-slate-500 group-hover:text-amber-300 transition-colors" />
+                <item.icon className="w-4 h-4 text-slate-500 group-hover:text-amber-400 transition-colors" />
                 {item.label}
               </span>
               {item.href === "/leads" && unworkedLeadCount > 0 && (
@@ -81,7 +82,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
 
         {/* Powered by */}
-        <div className="px-4 pb-3">
+        {/* Channel Status */}
+        <ChannelStatusBar />
+
+        <div className="px-4 py-2">
           <p className="text-[10px] text-slate-600 text-center">
             Powered by <a href="https://cogrow.ai" className="text-slate-500 hover:text-amber-400 transition-colors">CoGrow</a>
           </p>
