@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 /* ── Lead Notification Bar (top of page) ── */
 export function LeadNotificationBar({ count, latestName, latestService }: {
   count: number;
@@ -151,6 +153,15 @@ export function CompetitorComparison({ yours, industryHours, multiplier }: {
 
 /* ── Review Notification Toast ── */
 export function ReviewToast({ name, rating }: { name: string; rating: number }) {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(false), 5000);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (!visible) return null;
+
   return (
     <div style={{
       position: "fixed",
@@ -160,11 +171,34 @@ export function ReviewToast({ name, rating }: { name: string; rating: number }) 
       border: "1px solid #e5e7eb",
       borderRadius: 12,
       padding: "1rem 1.25rem",
+      paddingRight: "2.5rem",
       boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
       zIndex: 1000,
       animation: "slideInRight 0.4s ease-out",
       maxWidth: 320,
     }}>
+      <button
+        onClick={() => setVisible(false)}
+        style={{
+          position: "absolute",
+          top: "0.5rem",
+          right: "0.5rem",
+          width: 24,
+          height: 24,
+          borderRadius: 6,
+          border: "none",
+          background: "transparent",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#9ca3af",
+          fontSize: "1rem",
+        }}
+        aria-label="Dismiss"
+      >
+        ×
+      </button>
       <div style={{ fontSize: "0.875rem", fontWeight: 600 }}>
         ⭐ New {rating}-star review from {name}
       </div>
