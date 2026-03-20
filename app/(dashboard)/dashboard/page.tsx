@@ -1,10 +1,6 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
-import {
-  DASHBOARD_OPEN_INVOICE_STATUSES,
-  getInvoiceStatusLabel,
-  getLeadStatusLabel
-} from "@/lib/constants";
+import { getLeadStatusLabel } from "@/lib/constants";
 import { appConfig } from "@/lib/app-config";
 import {
   buildLeadSignals,
@@ -50,20 +46,10 @@ export default async function DashboardPage() {
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
 
-  const [leadPool, openInvoices, recentInvoices, recentLeads, recentlyBookedJobs, todaysJobs] = await Promise.all([
+  const [leadPool, recentLeads, recentlyBookedJobs, todaysJobs] = await Promise.all([
     prisma.lead.findMany({
       where: { status: { in: ["new", "contacted"] } },
       orderBy: { createdAt: "desc" }
-    }),
-    prisma.invoice.findMany({
-      where: { status: { in: [...DASHBOARD_OPEN_INVOICE_STATUSES] } },
-      include: { customer: true },
-      orderBy: [{ dueDate: "asc" }, { createdAt: "asc" }]
-    }),
-    prisma.invoice.findMany({
-      include: { customer: true },
-      orderBy: { createdAt: "desc" },
-      take: 5
     }),
     prisma.lead.findMany({ orderBy: { createdAt: "desc" }, take: 6 }),
     prisma.job.findMany({
@@ -84,13 +70,6 @@ export default async function DashboardPage() {
 
   const leadSignals = buildLeadSignals(leadPool, appConfig.ownerOps, now);
   const leadSummary = summarizeLeadSignals(leadSignals);
-  const overdueSentInvoices = openInvoices.filter(
-    (invoice) => invoice.status === "sent" && invoice.dueDate && invoice.dueDate.getTime() < now.getTime()
-  );
-  const unpaidTotalCents = openInvoices.reduce((sum, invoice) => sum + invoice.totalCents, 0);
-  const overdueTotalCents = overdueSentInvoices.reduce((sum, invoice) => sum + invoice.totalCents, 0);
-  const moneyAtRiskCents = overdueTotalCents + leadSummary.slippingRevenueCents;
-  const attentionNowCount = leadSummary.attentionNowCount + overdueSentInvoices.length;
   const leadLeakageQueue = leadSignals
     .filter((signal) => signal.isStale || signal.isFollowUpNeeded)
     .sort((a, b) => b.riskRevenueCents - a.riskRevenueCents || b.ageMinutes - a.ageMinutes)
@@ -120,13 +99,6 @@ export default async function DashboardPage() {
       title: "Respond to fresh leads first",
       detail: `${leadSummary.justArrivedCount} new leads arrived within ${appConfig.ownerOps.newLeadAlertMinutes} minutes.`,
       href: "/leads#priority-queue"
-    });
-  }
-  if (overdueSentInvoices.length > 0) {
-    nextActions.push({
-      title: "Collect overdue receivables",
-      detail: `${overdueSentInvoices.length} sent invoice${overdueSentInvoices.length === 1 ? "" : "s"} are overdue.`,
-      href: "/invoices"
     });
   }
   if (nextActions.length === 0) {
@@ -206,12 +178,12 @@ export default async function DashboardPage() {
           ctaLabel="View schedule"
         />
         <OwnerMetricCard
-          title="Unpaid invoices"
-          value={formatCurrency(unpaidTotalCents)}
-          detail={`${openInvoices.length} open · ${overdueSentInvoices.length} overdue`}
-          tone={overdueSentInvoices.length > 0 ? "danger" : unpaidTotalCents > 0 ? "warning" : "success"}
-          href="/invoices"
-          ctaLabel="Collect"
+          title="Recent work"
+          value={String(recentlyBookedJobs.length)}
+          detail={recentlyBookedJobs.length > 0 ? recentlyBookedJobs.map((job) => job.title).slice(0, 2).join(", ") : "No new work added this week"}
+          tone={recentlyBookedJobs.length > 0 ? "success" : "warning"}
+          href="/jobs"
+          ctaLabel="View work"
         />
         <OwnerMetricCard
           title="Missed leads"
@@ -308,30 +280,32 @@ export default async function DashboardPage() {
         </section>
 
         <section className="card">
-          <h2>Unpaid Invoice Watchlist</h2>
+          <h2>Recent Work Added</h2>
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Invoice</th>
+                  <th>Work</th>
                   <th>Customer</th>
-                  <th>Due</th>
-                  <th>Total</th>
-                  <th>Status</th>
+                  <th>Lead</th>
+                  <th>Created</th>
                 </tr>
               </thead>
               <tbody>
-                {openInvoices.slice(0, 6).map((invoice) => (
-                  <tr key={invoice.id}>
-                    <td>
-                      <Link href={`/invoices/${invoice.id}`}>{invoice.invoiceNumber}</Link>
-                    </td>
-                    <td>{invoice.customer.name}</td>
-                    <td>{formatDate(invoice.dueDate)}</td>
-                    <td>{formatCurrency(invoice.totalCents)}</td>
-                    <td>{getInvoiceStatusLabel(invoice.status)}</td>
+                {recentlyBookedJobs.length === 0 ? (
+                  <tr>
+                    <td colSpan={4}>No new work was added this week.</td>
                   </tr>
-                ))}
+                ) : (
+                  recentlyBookedJobs.slice(0, 6).map((job) => (
+                    <tr key={job.id}>
+                      <td>{job.title}</td>
+                      <td>{job.customer?.name || "—"}</td>
+                      <td>{job.lead?.name || "—"}</td>
+                      <td>{formatDate(job.createdAt)}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

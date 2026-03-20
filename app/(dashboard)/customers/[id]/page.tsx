@@ -1,9 +1,8 @@
-import Link from "next/link";
-import { getInvoiceStatusLabel, getJobStatusLabel } from "@/lib/constants";
-import { formatCurrency, formatDate } from "@/lib/format";
+import { getJobStatusLabel } from "@/lib/constants";
+import { formatDate } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { UserCircle, Phone, Mail, MapPin, ArrowRight } from "lucide-react";
+import { UserCircle, Phone, Mail, MapPin } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +11,6 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
     where: { id: params.id },
     include: {
       jobs: { orderBy: { createdAt: "desc" } },
-      invoices: { orderBy: { createdAt: "desc" } },
       activities: { where: { type: "note" }, orderBy: { createdAt: "desc" }, take: 20 },
     },
   });
@@ -24,9 +22,6 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
     in_progress: "bg-amber-50 text-amber-700 border-amber-200",
     completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
     cancelled: "bg-red-50 text-red-700 border-red-200",
-    draft: "bg-slate-50 text-slate-600 border-slate-200",
-    sent: "bg-blue-50 text-blue-700 border-blue-200",
-    paid: "bg-emerald-50 text-emerald-700 border-emerald-200",
   };
 
   return (
@@ -125,39 +120,6 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
           </table>
         ) : (
           <p className="px-5 py-6 text-sm text-slate-400 text-center">No jobs yet</p>
-        )}
-      </div>
-
-      {/* Invoices */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100">
-          <h2 className="font-display text-base font-bold text-slate-900">Invoices ({customer.invoices.length})</h2>
-        </div>
-        {customer.invoices.length > 0 ? (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/50">
-                <th className="text-left py-2.5 pl-5 pr-3 font-semibold text-slate-500 text-[11px] uppercase tracking-wider">Invoice</th>
-                <th className="text-left py-2.5 px-3 font-semibold text-slate-500 text-[11px] uppercase tracking-wider">Status</th>
-                <th className="text-right py-2.5 pr-5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customer.invoices.map((inv) => (
-                <tr key={inv.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                  <td className="py-2.5 pl-5 pr-3">
-                    <Link href={`/invoices/${inv.id}`} className="text-blue-600 hover:text-blue-500 font-medium text-[13px]">{inv.invoiceNumber}</Link>
-                  </td>
-                  <td className="py-2.5 px-3">
-                    <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border ${statusColor[inv.status] || "bg-slate-50 text-slate-600 border-slate-200"}`}>{getInvoiceStatusLabel(inv.status)}</span>
-                  </td>
-                  <td className="py-2.5 pr-5 text-right font-semibold text-slate-900 text-[13px]">{formatCurrency(inv.totalCents)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="px-5 py-6 text-sm text-slate-400 text-center">No invoices yet</p>
         )}
       </div>
 

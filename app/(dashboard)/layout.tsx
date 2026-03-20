@@ -2,7 +2,7 @@ import Link from "next/link";
 import { appConfig } from "@/lib/app-config";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { LayoutDashboard, Users, Briefcase, FileText, Clock, UserCircle, LogOut, Zap, Radio, Scale } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, Clock, UserCircle, LogOut, Zap, Radio, Scale } from "lucide-react";
 import { MobileMenuButton } from "@/app/(dashboard)/_components/mobile-nav";
 import { ChannelStatusBar } from "@/app/(dashboard)/_components/channel-status";
 
@@ -11,7 +11,6 @@ const navItems = [
   { href: "/leads", label: "Inquiries", icon: Scale },
   { href: "/customers", label: "Clients", icon: Users },
   { href: "/jobs", label: "Engagements", icon: Briefcase },
-  { href: "/invoices", label: "Invoices", icon: FileText },
   { href: "/lead-response", label: "Lead Response", icon: Radio },
   { href: "/activity", label: "Activity", icon: Clock },
 ];

@@ -6,7 +6,7 @@ import { Users, ArrowRight } from "lucide-react";
 
 export default async function CustomersPage() {
   const customers = await prisma.customer.findMany({
-    include: { _count: { select: { jobs: true, invoices: true } } },
+    include: { _count: { select: { jobs: true } } },
     orderBy: { createdAt: "desc" },
   });
 
@@ -62,7 +62,6 @@ export default async function CustomersPage() {
                 <th className="text-left py-3 px-3 font-semibold text-slate-500 text-[11px] uppercase tracking-wider">Contact</th>
                 <th className="text-left py-3 px-3 font-semibold text-slate-500 text-[11px] uppercase tracking-wider hidden sm:table-cell">Address</th>
                 <th className="text-center py-3 px-3 font-semibold text-slate-500 text-[11px] uppercase tracking-wider">Jobs</th>
-                <th className="text-center py-3 px-3 font-semibold text-slate-500 text-[11px] uppercase tracking-wider">Invoices</th>
                 <th className="text-right py-3 pr-5 lg:pr-6 pl-3 font-semibold text-slate-500 text-[11px] uppercase tracking-wider"></th>
               </tr>
             </thead>
@@ -81,9 +80,6 @@ export default async function CustomersPage() {
                   <td className="py-3 px-3 text-slate-500 text-[13px] hidden sm:table-cell">{customer.address || "—"}</td>
                   <td className="py-3 px-3 text-center">
                     <span className="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">{customer._count.jobs}</span>
-                  </td>
-                  <td className="py-3 px-3 text-center">
-                    <span className="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-50 text-slate-600 border border-slate-200">{customer._count.invoices}</span>
                   </td>
                   <td className="py-3 pr-5 lg:pr-6 pl-3 text-right">
                     <Link href={`/customers/${customer.id}`} className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-blue-600 transition-colors">

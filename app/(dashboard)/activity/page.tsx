@@ -8,7 +8,8 @@ import { Clock, ArrowRight } from "lucide-react";
 
 export default async function ActivityPage() {
   const activities = await prisma.activity.findMany({
-    include: { lead: true, customer: true, job: true, invoice: true, admin: true },
+    where: { invoiceId: null },
+    include: { lead: true, customer: true, job: true, admin: true },
     orderBy: { createdAt: "desc" },
     take: 200,
   });
@@ -17,8 +18,6 @@ export default async function ActivityPage() {
     lead_created: "bg-blue-50 text-blue-700 border-blue-200",
     lead_contacted: "bg-emerald-50 text-emerald-700 border-emerald-200",
     note: "bg-slate-50 text-slate-600 border-slate-200",
-    invoice_sent: "bg-amber-50 text-amber-700 border-amber-200",
-    invoice_paid: "bg-green-50 text-green-700 border-green-200",
     status_change: "bg-violet-50 text-violet-700 border-violet-200",
     sms_reply: "bg-cyan-50 text-cyan-700 border-cyan-200",
   };
@@ -62,11 +61,6 @@ export default async function ActivityPage() {
                   {activity.jobId && (
                     <Link href={`/jobs`} className="text-[11px] text-blue-500 hover:text-blue-600 transition-colors inline-flex items-center gap-0.5">
                       {activity.job ? activity.job.title : "Job"} <ArrowRight className="w-2.5 h-2.5" />
-                    </Link>
-                  )}
-                  {activity.invoiceId && (
-                    <Link href={`/invoices/${activity.invoiceId}`} className="text-[11px] text-blue-500 hover:text-blue-600 transition-colors inline-flex items-center gap-0.5">
-                      Invoice <ArrowRight className="w-2.5 h-2.5" />
                     </Link>
                   )}
                 </div>
