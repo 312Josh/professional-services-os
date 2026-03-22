@@ -1,428 +1,391 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { Phone, Clock, Shield, Star, Zap, Scale, BookOpen, Briefcase, Users, Gavel, Home, ArrowRight, MapPin, Award, TrendingDown, MessageSquare, CalendarCheck, BarChart3, ChevronRight, Lock } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { LiveToast } from "@/components/live-toast";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { BookingModal } from "@/components/booking-modal";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Award, BookOpen, CalendarCheck, ChevronRight, Clock, HeartHandshake, Home, Landmark, Lock, MapPin, Phone, Scale, ShieldCheck, Star, Users } from "lucide-react";
 import { getBrand } from "@/lib/brand-client";
 
-// BRAND is now read from NEXT_PUBLIC_ env vars (generated from white-label.config.json)
-// Fallbacks are in getBrand() for safety
-
 const PRACTICE_AREAS = [
-  { name: "Elder Law & Medicaid Planning", icon: Users },
-  { name: "Estate Planning", icon: BookOpen },
-  { name: "Probate & Estate Administration", icon: Briefcase },
-  { name: "Long-Term Care Planning", icon: Shield },
-  { name: "Veterans Benefits", icon: Home },
-  { name: "Guardianship & Conservatorship", icon: Gavel },
+  {
+    title: "Elder Law & Medicaid Planning",
+    description: "Protect assets, plan for care costs, and make thoughtful decisions before a health crisis forces your hand.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Estate Planning & Trusts",
+    description: "Create wills, trusts, powers of attorney, and healthcare documents that give your family clarity and peace of mind.",
+    icon: BookOpen,
+  },
+  {
+    title: "Probate & Estate Administration",
+    description: "Navigate probate with steady legal guidance after a loss, with less confusion and less strain on the family.",
+    icon: Landmark,
+  },
+  {
+    title: "Guardianship & Conservatorship",
+    description: "Get help when a loved one can no longer make safe decisions independently and legal authority becomes necessary.",
+    icon: Users,
+  },
+  {
+    title: "Long-Term Care Planning",
+    description: "Prepare for future care needs with practical legal strategies that balance dignity, protection, and financial reality.",
+    icon: Home,
+  },
+  {
+    title: "Veterans Benefits",
+    description: "Understand eligibility, coordinate benefits planning, and make sure veteran families are not leaving options unused.",
+    icon: Award,
+  },
 ];
 
-const REVIEWS = [
-  { name: "Maria S.", service: "Elder Law & Medicaid Planning", text: "I was going through a difficult divorce and needed an attorney fast. They responded within 10 minutes and made me feel heard from the first call.", rating: 5, date: "1 month ago" },
-  { name: "James W.", service: "Estate Planning", text: "Set up our family trust and estate plan. Thorough, patient, and explained everything in plain English. Exactly what we needed.", rating: 5, date: "3 weeks ago" },
-  { name: "Linda C.", service: "Probate & Estate Administration", text: "Handled our business incorporation and operating agreement. Professional, responsive, and finished ahead of schedule.", rating: 5, date: "2 months ago" },
-  { name: "Robert K.", service: "Long-Term Care Planning", text: "After my accident, I didn't know where to turn. They took my case on contingency and got me a settlement I never expected.", rating: 5, date: "1 month ago" },
-  { name: "Angela T.", service: "Veterans Benefits", text: "Closed on our first home with zero stress. They caught issues the seller's attorney missed. Worth every penny.", rating: 4, date: "6 weeks ago" },
+const TRUST_STRIP = ["NAELA Member", "15+ Years Serving Greater Boston", "Free Initial Consultation", "Confidential Guidance"];
+
+const WHY_US = [
+  {
+    title: "Focused on elder law, not general practice noise",
+    body: "Families facing aging-parent decisions need guidance from a team that understands Medicaid, estate planning, probate, guardianship, and long-term care planning together.",
+  },
+  {
+    title: "Warm, clear communication in difficult moments",
+    body: "This work is personal. We explain options in plain language, move at the right pace, and help families feel steady instead of overwhelmed.",
+  },
+  {
+    title: "Local guidance for Needham and Greater Boston families",
+    body: "We understand the practical realities families face across Needham, Wellesley, Newton, Dedham, Dover, Brookline, and nearby communities.",
+  },
 ];
 
-const TRUST_ITEMS = [
-  { icon: Scale, label: "Bar Admitted", desc: "Experienced elder law counsel serving Needham and Greater Boston families." },
-  { icon: Award, label: "NAELA Member", desc: "National Academy of Elder Law Attorneys member." },
-  { icon: Star, label: "Super Lawyers", desc: "Recognized by Super Lawyers for excellence." },
-  { icon: Shield, label: "5-Star Reviews", desc: "Trusted by families for thoughtful, compassionate guidance." },
-  { icon: MessageSquare, label: "Free Consultation", desc: "Free initial consultation for families planning their next step." },
-  { icon: Lock, label: "Confidential", desc: "Confidential conversations from your first call." },
+const PROCESS = [
+  {
+    step: "01",
+    title: "Free consultation",
+    body: "Share what your family is facing and get a clear first conversation about priorities, risks, and the best next step.",
+  },
+  {
+    step: "02",
+    title: "Custom plan",
+    body: "We build the right legal plan around your family, whether that means Medicaid planning, trust work, probate support, or guardianship guidance.",
+  },
+  {
+    step: "03",
+    title: "Peace of mind",
+    body: "Move forward knowing the legal pieces are in place and your family has a clearer path through a difficult season.",
+  },
 ];
 
-const SOLUTION_STEPS = [
-  { icon: Zap, num: "01", title: "Free Consultation", body: "Start with a calm, confidential conversation about your family's situation, concerns, and goals." },
-  { icon: MessageSquare, num: "02", title: "Custom Plan", body: "If your team doesn't answer, the system sends a response within 60 seconds: \"Thank you for contacting Heritage Elder Law Group. An attorney will call you within 10 minutes.\" That text alone saves 40% of inquiries." },
-  { icon: CalendarCheck, num: "03", title: "Peace of Mind", body: "Move forward with a plan that protects loved ones, preserves assets where possible, and gives your family more confidence." },
-  { icon: BarChart3, num: "04", title: "Local Support", body: "Work with a local team that understands the family, financial, and emotional realities behind elder law decisions." },
-];
-
-const COMPETITOR_ROWS = [
-  { label: "Response Time", you: "10 minutes", them: "3 days" },
-  { label: "Inquiry Follow-Up", you: "Automatic", them: "Manual (if at all)" },
-  { label: "Peace of Mind", you: "24/7", them: "Phone only" },
-  { label: "Client Visibility", you: "Real-time dashboard", them: "Spreadsheet (maybe)" },
-  { label: "Missed Inquiry Recovery", you: "Automatic text + email", them: "None" },
+const TESTIMONIALS = [
+  {
+    name: "Karen M.",
+    service: "Medicaid Planning",
+    text: "We were overwhelmed trying to help my mother qualify for long-term care. Heritage Elder Law Group walked us through Medicaid planning with patience and clarity, and we finally felt like we had a plan.",
+    rating: 5,
+  },
+  {
+    name: "Thomas & Ellen R.",
+    service: "Estate Planning & Trusts",
+    text: "We put off our estate plan for years. They made the process calm, organized, and far easier than we expected. We left with real peace of mind.",
+    rating: 5,
+  },
+  {
+    name: "Melissa D.",
+    service: "Probate & Estate Administration",
+    text: "After my father passed away, probate felt impossible to navigate alone. They explained each step, kept us informed, and handled everything with compassion.",
+    rating: 5,
+  },
+  {
+    name: "George P.",
+    service: "Guardianship & Conservatorship",
+    text: "We needed guardianship for an aging parent and did not know where to begin. They were steady, responsive, and thoughtful through the entire process.",
+    rating: 5,
+  },
+  {
+    name: "William H.",
+    service: "Veterans Benefits",
+    text: "As a veteran, I was not sure what benefits my family could access. They helped us understand the options and put a plan in place that actually made a difference.",
+    rating: 5,
+  },
 ];
 
 const FAQ = [
-  { q: "How quickly can we schedule a consultation?", a: "We offer a free initial consultation and work to schedule families promptly based on urgency and availability." },
-  { q: "Do you offer free consultations?", a: "Yes. Your initial consultation is free with no obligation. We'll listen to your situation, explain your options, and give you an honest assessment of your case." },
-  { q: "What practice areas do you cover?", a: "We focus on elder law, estate planning, probate, guardianship, long-term care planning, and veterans benefits for families in Needham and Greater Boston." },
-  { q: "How are your fees structured?", a: "Fee structures vary by practice area. Personal injury cases are handled on contingency (no fee unless we win). Other matters use flat fees or hourly billing, always disclosed upfront before engagement." },
-  { q: "Is my consultation confidential?", a: "Absolutely. All communications with our firm are protected by attorney-client privilege from the moment you contact us." },
-  { q: "Can I schedule a consultation online?", a: "Yes. You can book a consultation directly from our website 24/7. Choose a time that works for you and receive instant confirmation." },
+  {
+    q: "What is elder law?",
+    a: "Elder law focuses on the legal and financial issues that affect older adults and their families, including estate planning, long-term care planning, Medicaid, probate, guardianship, and veterans benefits.",
+  },
+  {
+    q: "When should I start planning?",
+    a: "Earlier is better. Planning before a health crisis gives your family more options, less stress, and more time to make thoughtful decisions.",
+  },
+  {
+    q: "How does Medicaid planning work?",
+    a: "Medicaid planning looks at assets, income, care needs, and timing to help families protect what they can while preparing for long-term care costs within the rules.",
+  },
+  {
+    q: "What's the difference between a will and a trust?",
+    a: "A will says how assets should be handled after death, while a trust can manage assets during life and after death, often with more control, privacy, and probate avoidance.",
+  },
+  {
+    q: "How much does a consultation cost?",
+    a: "We offer a free initial consultation so families can understand their options and decide on the right next step before making a commitment.",
+  },
+  {
+    q: "Can you help with VA benefits?",
+    a: "Yes. We help eligible veterans and families understand benefits planning and how it may fit into a broader long-term care strategy.",
+  },
 ];
 
-const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5 } }) } as const;
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } } as const;
+const SERVICE_AREAS = ["Needham", "Wellesley", "Newton", "Dedham", "Dover", "Brookline", "Westwood", "Greater Boston"];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.45 } }),
+} as const;
 
 function Stars({ count }: { count: number }) {
-  return <span className="text-amber-400 tracking-wider">{"★".repeat(count)}{"☆".repeat(5 - count)}</span>;
+  return <span className="tracking-[0.2em] text-amber-500">{"★".repeat(count)}</span>;
 }
 
 export default function HomePage() {
-  const BRAND = getBrand();
+  const brand = getBrand();
+  const phoneHref = `tel:${brand.phone.replace(/[^\d]/g, "")}`;
 
   return (
-    <div className="grain min-h-screen bg-white">
-      <LiveToast />
-
-      {/* ══════════ LIVE NOTIFICATION BAR ══════════ */}
-      <div className="bg-[#0f1f35] text-white text-center text-[13px] font-medium py-2.5 px-4 flex items-center justify-center gap-2">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-        </span>
-        <span>Free initial consultations available — call or schedule confidentially today</span>
+    <div className="min-h-screen bg-[#f7f2e8] text-[#182638]">
+      <div className="border-b border-[#d8c7ac] bg-[#182638] px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.22em] text-[#f2dfb8] sm:text-sm">
+        Protecting Families. Preserving Legacies.
       </div>
 
-      {/* ══════════ HERO ══════════ */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0f1f35] via-[#162d4a] to-[#1a3550]" />
-        <div className="absolute inset-0 opacity-15" style={{ backgroundImage: "radial-gradient(at 25% 75%, rgba(30,58,95,0.4) 0, transparent 50%), radial-gradient(at 75% 25%, rgba(212,175,55,0.12) 0, transparent 50%)" }} />
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-white" style={{ clipPath: "polygon(0 100%, 100% 100%, 100% 0)" }} />
-
-        <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-32 md:pt-24 md:pb-40">
-          <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-2xl">
-            <motion.div custom={0} variants={fadeUp}>
-              <Badge variant="outline" className="text-amber-300 border-amber-300/30 bg-amber-300/10 mb-6 text-sm font-medium px-3 py-1.5 rounded-full">
-                <Clock className="w-3.5 h-3.5 mr-1.5" /> {BRAND.responseMin}-Minute Response to Every Inquiry
-              </Badge>
-            </motion.div>
-
-            <motion.h1 custom={1} variants={fadeUp} className="font-display text-[2.5rem] sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold text-white leading-[1.05] tracking-tight">
-              Your Next Client Called.{" "}
-              <span className="text-amber-300">You Didn&apos;t Answer.</span>
-            </motion.h1>
-
-            <motion.p custom={2} variants={fadeUp} className="mt-6 text-lg sm:text-xl text-slate-300 leading-relaxed max-w-xl">
-              Thoughtful elder law planning helps families make clear decisions before a crisis. We guide you with warmth, clarity, and practical next steps.
+      <section className="relative overflow-hidden border-b border-[#ddd2c1] bg-[linear-gradient(180deg,#fbf6ee_0%,#f3eadb_100%)]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(208,171,103,0.18),transparent_34%),radial-gradient(circle_at_80%_20%,rgba(24,38,56,0.08),transparent_30%)]" />
+        <div className="relative mx-auto grid max-w-6xl gap-12 px-6 py-14 md:grid-cols-[1.1fr_0.9fr] md:items-center md:py-20">
+          <motion.div initial="hidden" animate="visible" className="max-w-2xl">
+            <motion.p custom={0} variants={fadeUp} className="text-sm font-semibold uppercase tracking-[0.28em] text-[#9f7743]">
+              Heritage Elder Law Group
             </motion.p>
-
+            <motion.h1 custom={1} variants={fadeUp} className="mt-5 font-display text-5xl leading-[0.95] tracking-tight text-[#182638] md:text-7xl">
+              Your family&apos;s future, protected with warmth, clarity, and experience.
+            </motion.h1>
+            <motion.p custom={2} variants={fadeUp} className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
+              Elder law and estate planning guidance for families in Needham and Greater Boston who want thoughtful legal help before a crisis turns into chaos.
+            </motion.p>
             <motion.div custom={3} variants={fadeUp} className="mt-8 flex flex-wrap gap-3">
-              {[
-                { icon: Scale, label: "Bar Admitted" },
-                { icon: Star, label: "Super Lawyers" },
-                { icon: Shield, label: "NAELA Member" },
-                { icon: Lock, label: "Confidential" },
-              ].map((b) => (
-                <span key={b.label} className="flex items-center gap-1.5 text-[13px] text-slate-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
-                  <b.icon className="w-3.5 h-3.5 text-amber-300" /> {b.label}
+              <BookingModal
+                trigger={
+                  <Button size="lg" className="h-14 rounded-full bg-[#182638] px-8 text-base font-bold text-[#f7f2e8] hover:bg-[#23364f]">
+                    <CalendarCheck className="mr-2 h-5 w-5" />
+                    Schedule Consultation
+                  </Button>
+                }
+                brandColor="#1b2a41"
+              />
+              <Button asChild size="lg" variant="outline" className="h-14 rounded-full border-[#c8b18c] bg-white/80 px-8 text-base font-semibold text-[#182638] hover:bg-white">
+                <a href={phoneHref}>
+                  <Phone className="mr-2 h-4 w-4" />
+                  Call Now
+                </a>
+              </Button>
+            </motion.div>
+            <motion.div custom={4} variants={fadeUp} className="mt-8 flex flex-wrap gap-3">
+              {TRUST_STRIP.map((item) => (
+                <span key={item} className="rounded-full border border-[#d7cab7] bg-white/85 px-4 py-2 text-sm font-medium text-slate-600">
+                  {item}
                 </span>
               ))}
             </motion.div>
-
-            <motion.div custom={4} variants={fadeUp} className="mt-10 flex flex-col sm:flex-row gap-4">
-              <BookingModal trigger={
-                <Button size="lg" className="bg-amber-500 hover:bg-amber-400 text-[#0f1f35] font-bold text-base px-8 h-14 rounded-full shadow-lg shadow-amber-500/20 hover:shadow-amber-400/30 hover:scale-[1.02] transition-all">
-                  <CalendarCheck className="w-5 h-5 mr-2" />
-                  Schedule Free Consultation
-                </Button>
-              } brandColor="#1e3a5f" />
-              <Button asChild variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10 font-medium text-base px-8 h-14 rounded-full">
-                <a href="#how">See How It Works <ChevronRight className="w-4 h-4 ml-1" /></a>
-              </Button>
-            </motion.div>
           </motion.div>
 
-          {/* Floating response scoreboard */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, x: 30 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            transition={{ delay: 0.7, duration: 0.6 }}
-            className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2"
-          >
-            <div className="bg-white/[0.04] backdrop-blur-xl border border-white/10 rounded-2xl p-8 text-center w-60">
-              <p className="text-[11px] uppercase tracking-[0.15em] text-slate-500 font-semibold mb-3">Your Response</p>
-              <p className="font-display text-7xl font-bold text-amber-300 leading-none">{BRAND.responseMin}</p>
-              <p className="text-slate-300 text-sm mt-1 font-medium">minutes avg</p>
-              <div className="mt-5 pt-5 border-t border-white/10 space-y-1">
-                <p className="text-[11px] text-slate-500 uppercase tracking-widest">Industry avg</p>
-                <p className="text-slate-400 font-semibold text-lg line-through decoration-red-400/60 decoration-2">3 days</p>
-              </div>
-              <div className="mt-4 text-xs text-emerald-400 font-semibold flex items-center justify-center gap-1">
-                <TrendingDown className="w-3 h-3" /> Faster than 98% of firms
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ══════════ THE PROBLEM ══════════ */}
-      <section className="py-20 md:py-28 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            <motion.p custom={0} variants={fadeUp} className="text-red-500 font-semibold text-sm uppercase tracking-widest mb-4">The Problem</motion.p>
-            <motion.h2 custom={1} variants={fadeUp} className="font-display text-3xl sm:text-4xl md:text-[2.75rem] font-bold text-[#0f1f35] tracking-tight leading-tight">
-              The Average Law Firm Takes 3 Days to Return a Consultation Request.
-            </motion.h2>
-            <motion.p custom={2} variants={fadeUp} className="mt-6 text-slate-500 text-lg leading-relaxed max-w-2xl">
-              By then, your potential client already hired someone else. They&apos;re not waiting. They&apos;re Googling, calling, and retaining whoever responds first.
-            </motion.p>
-
-            <motion.div custom={3} variants={fadeUp} className="mt-10 rounded-xl border border-slate-200 overflow-hidden">
-              <div className="bg-slate-50 px-6 py-3 text-sm font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
-                Why families benefit from planning before a crisis
-              </div>
-              {[
-                ["Potential client submits intake form Friday evening", "You see it Monday morning"],
-                ["They contact 3 firms over the weekend", "You're the last to respond"],
-                ["They retain whoever called back first", "You never had a chance"],
-                ["That case was worth $5,000–$15,000", "Gone. Every month."],
-              ].map(([what, impact], i) => (
-                <div key={i} className={`flex flex-col sm:flex-row px-6 py-4 ${i < 3 ? "border-b border-slate-100" : ""}`}>
-                  <span className="sm:w-1/2 text-slate-700 font-medium text-[15px]">{what}</span>
-                  <span className="sm:w-1/2 text-slate-500 text-[15px] mt-1 sm:mt-0">{impact}</span>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.45 }}>
+            <Card className="rounded-[2rem] border-[#d8c7ac] bg-white/95 shadow-[0_24px_60px_rgba(24,38,56,0.10)]">
+              <CardContent className="p-8">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#9f7743]">Why families reach out</p>
+                <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-[#182638]">
+                  Calm guidance for some of life&apos;s hardest decisions.
+                </h2>
+                <div className="mt-6 space-y-4 text-[15px] leading-7 text-slate-600">
+                  <div className="flex items-start gap-3">
+                    <HeartHandshake className="mt-1 h-4 w-4 text-[#b88a48]" />
+                    <p>Medicaid planning for aging parents and long-term care decisions</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Scale className="mt-1 h-4 w-4 text-[#b88a48]" />
+                    <p>Estate plans, trusts, and legal documents that protect loved ones</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <MapPin className="mt-1 h-4 w-4 text-[#b88a48]" />
+                    <p>Serving Needham, Wellesley, Newton, Dedham, Dover, Brookline, and nearby communities</p>
+                  </div>
                 </div>
-              ))}
-            </motion.div>
-
-            <motion.div custom={4} variants={fadeUp} className="mt-8 p-5 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-red-800 font-display font-bold text-xl">
-                $10,000+/month in lost revenue. <span className="font-normal text-red-600 text-base">And it compounds — lost clients don&apos;t refer.</span>
-              </p>
-            </motion.div>
+                <div className="mt-8 grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl bg-[#f7f2e8] p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Call</p>
+                    <p className="mt-1 font-semibold text-[#182638]">{brand.phone}</p>
+                  </div>
+                  <div className="rounded-2xl bg-[#f7f2e8] p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Area</p>
+                    <p className="mt-1 font-semibold text-[#182638]">{brand.area}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </motion.div>
         </div>
       </section>
 
-      {/* ══════════ THE SOLUTION ══════════ */}
-      <section id="how" className="py-20 md:py-28 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-16">
-            <motion.p custom={0} variants={fadeUp} className="text-[#1e3a5f] font-semibold text-sm uppercase tracking-widest mb-3">The Solution</motion.p>
-            <motion.h2 custom={1} variants={fadeUp} className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#0f1f35] tracking-tight">
-              Respond First. Win the Client.<br className="hidden sm:block" /> It&apos;s That Simple.
-            </motion.h2>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger} className="grid sm:grid-cols-2 gap-6">
-            {SOLUTION_STEPS.map((step, i) => (
-              <motion.div key={step.num} custom={i} variants={fadeUp}>
-                <Card className="h-full border-slate-200 hover:border-[#1e3a5f]/30 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group">
-                  <CardContent className="pt-7 pb-6 px-7">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="font-display text-sm font-bold text-[#1e3a5f] bg-[#1e3a5f]/10 w-9 h-9 flex items-center justify-center rounded-lg">{step.num}</span>
-                      <h3 className="font-display text-lg font-bold text-[#0f1f35]">{step.title}</h3>
-                    </div>
-                    <p className="text-slate-500 text-[15px] leading-relaxed">{step.body}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
+      <section className="border-b border-[#e4d8c7] bg-white py-14">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid gap-4 md:grid-cols-3">
+            {WHY_US.map((item) => (
+              <div key={item.title} className="rounded-[1.6rem] border border-[#e6dbcc] bg-[#fffdfa] p-6 shadow-sm">
+                <h3 className="font-display text-xl font-bold text-[#182638]">{item.title}</h3>
+                <p className="mt-3 text-[15px] leading-7 text-slate-600">{item.body}</p>
+              </div>
             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ══════════ CREDENTIALS / TRUST ══════════ */}
-      <section className="py-20 md:py-28">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-14">
-            <motion.p custom={0} variants={fadeUp} className="text-[#1e3a5f] font-semibold text-sm uppercase tracking-widest mb-3">Credentials</motion.p>
-            <motion.h2 custom={1} variants={fadeUp} className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#0f1f35] tracking-tight">
-              Why Clients Trust Our Firm
-            </motion.h2>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {TRUST_ITEMS.map((item, i) => (
-              <motion.div key={item.label} custom={i} variants={fadeUp} className="flex items-start gap-4 p-5 rounded-xl hover:bg-slate-50 transition-colors">
-                <div className="w-10 h-10 rounded-lg bg-[#1e3a5f]/10 flex items-center justify-center flex-shrink-0">
-                  <item.icon className="w-5 h-5 text-[#1e3a5f]" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-[#0f1f35] text-[15px]">{item.label}</h3>
-                  <p className="text-slate-500 text-sm mt-0.5">{item.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ══════════ PRACTICE AREAS ══════════ */}
-      <section className="py-16 bg-slate-50 border-y border-slate-100">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <p className="text-[#1e3a5f] font-semibold text-sm uppercase tracking-widest mb-3">Practice Areas</p>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#0f1f35] tracking-tight">Areas of Practice</h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        </div>
+      </section>
+
+      <section className="bg-[#fbf7f0] py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#9f7743]">Practice Areas</p>
+            <h2 className="mt-4 font-display text-4xl font-bold tracking-tight text-[#182638] md:text-5xl">
+              Legal guidance for the questions families cannot afford to leave unresolved.
+            </h2>
+          </div>
+          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {PRACTICE_AREAS.map((area) => (
-              <div key={area.name} className="flex items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 hover:border-[#1e3a5f]/30 hover:shadow-sm transition-all">
-                <area.icon className="w-5 h-5 text-[#1e3a5f] flex-shrink-0" />
-                <span className="font-display font-semibold text-[#0f1f35] text-sm">{area.name}</span>
+              <Card key={area.title} className="rounded-[1.8rem] border-[#e5d8c5] bg-white shadow-sm">
+                <CardContent className="p-7">
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f3ead9] text-[#9f7743]">
+                    <area.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-display text-2xl font-bold tracking-tight text-[#182638]">{area.title}</h3>
+                  <p className="mt-3 text-[15px] leading-7 text-slate-600">{area.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#182638] py-20 text-white">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#f2dfb8]">What working together looks like</p>
+            <h2 className="mt-4 font-display text-4xl font-bold tracking-tight md:text-5xl">
+              A clear process for families who need calm, capable legal guidance.
+            </h2>
+          </div>
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {PROCESS.map((item) => (
+              <div key={item.step} className="rounded-[1.8rem] border border-white/10 bg-white/5 p-7 backdrop-blur">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#f2dfb8]">{item.step}</p>
+                <h3 className="mt-4 font-display text-2xl font-bold">{item.title}</h3>
+                <p className="mt-3 text-[15px] leading-7 text-slate-300">{item.body}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════ COMPETITOR COMPARISON ══════════ */}
-      <section className="py-20 md:py-28 bg-[#0f1f35]">
-        <div className="max-w-4xl mx-auto px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
-            <motion.p custom={0} variants={fadeUp} className="text-amber-300 font-semibold text-sm uppercase tracking-widest mb-3">Comparison</motion.p>
-            <motion.h2 custom={1} variants={fadeUp} className="font-display text-3xl sm:text-4xl font-bold text-white tracking-tight">Why Families Choose Heritage Elder Law Group</motion.h2>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="rounded-xl border border-white/10 overflow-hidden">
-            <div className="grid grid-cols-3 bg-white/5 px-6 py-3 text-xs font-semibold uppercase tracking-wider border-b border-white/10">
-              <span className="text-slate-500"></span>
-              <span className="text-amber-300 text-center">Your Firm</span>
-              <span className="text-slate-500 text-center">Average Firm</span>
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#9f7743]">Service Area</p>
+              <h2 className="mt-4 font-display text-4xl font-bold tracking-tight text-[#182638]">Serving Needham and families across Greater Boston.</h2>
+              <p className="mt-5 text-lg leading-8 text-slate-600">
+                Families often reach out in moments of uncertainty — after a diagnosis, during a care transition, or while trying to avoid probate and long-term care mistakes. Local, experienced guidance matters.
+              </p>
             </div>
-            {COMPETITOR_ROWS.map((row, i) => (
-              <motion.div key={row.label} custom={i} variants={fadeUp} className={`grid grid-cols-3 px-6 py-4 items-center ${i < COMPETITOR_ROWS.length - 1 ? "border-b border-white/5" : ""}`}>
-                <span className="text-slate-300 text-sm font-medium">{row.label}</span>
-                <span className="text-center text-white font-bold text-sm">{row.you}</span>
-                <span className="text-center text-slate-500 text-sm">{row.them}</span>
-              </motion.div>
-            ))}
-          </motion.div>
+            <div className="rounded-[2rem] border border-[#e5d8c5] bg-[#f9f3e8] p-7">
+              <div className="grid gap-3 sm:grid-cols-2">
+                {SERVICE_AREAS.map((area) => (
+                  <div key={area} className="rounded-2xl border border-[#e0d2bf] bg-white px-4 py-4 text-sm font-semibold text-[#182638]">
+                    {area}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ══════════ TESTIMONIALS ══════════ */}
-      <section className="py-20 md:py-28 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-14">
-            <motion.p custom={0} variants={fadeUp} className="text-[#1e3a5f] font-semibold text-sm uppercase tracking-widest mb-3">Testimonials</motion.p>
-            <motion.h2 custom={1} variants={fadeUp} className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-[#0f1f35] tracking-tight">What Families Say</motion.h2>
-            <motion.p custom={2} variants={fadeUp} className="text-slate-500 mt-3 text-lg">
-              <Stars count={5} /> <span className="font-semibold text-[#0f1f35]">5.0</span> average from 5 featured family reviews
-            </motion.p>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {REVIEWS.slice(0, 3).map((r, i) => (
-              <motion.div key={r.name} custom={i} variants={fadeUp}>
-                <Card className="h-full border-slate-200">
-                  <CardContent className="pt-6 pb-5 px-6">
-                    <Stars count={r.rating} />
-                    <p className="mt-3 text-slate-600 text-[15px] leading-relaxed italic">&ldquo;{r.text}&rdquo;</p>
-                    <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold text-sm text-[#0f1f35]">{r.name}</p>
-                        <p className="text-xs text-slate-400">{r.service}</p>
-                      </div>
-                      <span className="text-xs text-slate-400">{r.date}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-          <div className="mt-5 grid sm:grid-cols-2 gap-4">
-            {REVIEWS.slice(3).map((r) => (
-              <div key={r.name} className="flex items-start gap-3 p-4 bg-white rounded-xl border border-slate-100">
-                <div className="flex-shrink-0 mt-0.5"><Stars count={r.rating} /></div>
-                <div className="min-w-0">
-                  <p className="text-sm text-slate-600 leading-relaxed">&ldquo;{r.text}&rdquo;</p>
-                  <p className="text-xs text-slate-400 mt-1.5">{r.name} · {r.service} · {r.date}</p>
-                </div>
-              </div>
+      <section className="bg-[#fbf7f0] py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#9f7743]">Testimonials</p>
+            <h2 className="mt-4 font-display text-4xl font-bold tracking-tight text-[#182638] md:text-5xl">What families say about working with us.</h2>
+          </div>
+          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {TESTIMONIALS.map((review) => (
+              <Card key={review.name} className="rounded-[1.8rem] border-[#e5d8c5] bg-white shadow-sm">
+                <CardContent className="p-7">
+                  <Stars count={review.rating} />
+                  <p className="mt-4 text-[15px] leading-7 text-slate-600">“{review.text}”</p>
+                  <div className="mt-6 border-t border-slate-100 pt-4">
+                    <p className="font-display text-lg font-bold text-[#182638]">{review.name}</p>
+                    <p className="text-sm text-slate-500">{review.service}</p>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════ FAQ ══════════ */}
-      <section className="py-20 md:py-28">
-        <div className="max-w-3xl mx-auto px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
-            <motion.p custom={0} variants={fadeUp} className="text-[#1e3a5f] font-semibold text-sm uppercase tracking-widest mb-3">FAQ</motion.p>
-            <motion.h2 custom={1} variants={fadeUp} className="font-display text-3xl sm:text-4xl font-bold text-[#0f1f35] tracking-tight">
-              Frequently Asked Questions
-            </motion.h2>
-          </motion.div>
-
-          <Accordion type="single" collapsible className="w-full">
-            {FAQ.map((item, i) => (
-              <AccordionItem key={i} value={`q-${i}`} className="border-slate-200">
-                <AccordionTrigger className="text-left font-display font-semibold text-[#0f1f35] hover:text-[#1e3a5f] text-[15px] py-5">{item.q}</AccordionTrigger>
-                <AccordionContent className="text-slate-500 text-[15px] leading-relaxed pb-5">{item.a}</AccordionContent>
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-3xl px-6">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#9f7743]">FAQ</p>
+            <h2 className="mt-4 font-display text-4xl font-bold tracking-tight text-[#182638]">Common questions from families planning ahead.</h2>
+          </div>
+          <Accordion type="single" collapsible className="mt-10 w-full">
+            {FAQ.map((item, index) => (
+              <AccordionItem key={index} value={`faq-${index}`} className="border-b border-[#e5d8c5]">
+                <AccordionTrigger className="py-5 text-left font-display text-lg font-semibold text-[#182638]">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="pb-5 text-[15px] leading-7 text-slate-600">
+                  {item.a}
+                </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
         </div>
       </section>
 
-      {/* ══════════ BOTTOM CTA ══════════ */}
-      <section id="consult" className="relative py-20 md:py-28 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0f1f35] via-[#162d4a] to-[#1a3550]" />
-        <div className="absolute inset-0 opacity-15" style={{ backgroundImage: "radial-gradient(at 60% 40%, rgba(212,175,55,0.2) 0, transparent 50%)" }} />
-        <div className="relative max-w-3xl mx-auto px-6 text-center">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            <motion.h2 custom={0} variants={fadeUp} className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight">
-              Ready to protect your family's future?
-            </motion.h2>
-            <motion.p custom={1} variants={fadeUp} className="mt-5 text-slate-300 text-lg leading-relaxed max-w-xl mx-auto">
-              Get your free intake audit. We&apos;ll show you exactly how fast your firm responds to inquiries — and what it&apos;s costing you.
-            </motion.p>
-            <motion.div custom={2} variants={fadeUp} className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-amber-500 hover:bg-amber-400 text-[#0f1f35] font-bold text-base px-10 h-14 rounded-full shadow-lg shadow-amber-500/20 hover:shadow-amber-400/30 hover:scale-[1.02] transition-all">
-                <a href={`tel:${BRAND.phone}`}>
-                  Schedule Free Consultation
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </a>
-              </Button>
-            </motion.div>
-            <motion.p custom={3} variants={fadeUp} className="mt-4 text-sm text-slate-400">
-              No fee. No commitment. Confidential.
-            </motion.p>
-            <motion.p custom={4} variants={fadeUp} className="mt-6 text-slate-300">
-              Call now: <a href={`tel:${BRAND.phone}`} className="text-amber-300 font-bold hover:text-amber-200 transition-colors">{BRAND.phone}</a>
-            </motion.p>
-          </motion.div>
+      <section className="bg-[linear-gradient(180deg,#182638_0%,#21334a_100%)] py-20 text-white">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#f2dfb8]">Free Initial Consultation</p>
+          <h2 className="mt-4 font-display text-4xl font-bold tracking-tight md:text-5xl">
+            Start with a calm conversation about what your family needs next.
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+            Whether you are planning ahead, helping an aging parent, or navigating a difficult transition right now, we can help you understand the options and move forward with confidence.
+          </p>
+          <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+            <BookingModal
+              trigger={
+                <Button size="lg" className="h-14 rounded-full bg-amber-500 px-8 text-base font-bold text-[#182638] hover:bg-amber-400">
+                  Schedule Consultation
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              }
+              brandColor="#1b2a41"
+            />
+            <Button asChild size="lg" variant="outline" className="h-14 rounded-full border-white/15 bg-transparent px-8 text-base font-semibold text-white hover:bg-white/10">
+              <a href={phoneHref}>
+                <Phone className="mr-2 h-4 w-4" />
+                Call {brand.phone}
+              </a>
+            </Button>
+          </div>
+          <p className="mt-5 text-sm text-slate-300">Confidential guidance. Family-first planning. Serving Needham and Greater Boston.</p>
         </div>
       </section>
-
-      {/* ══════════ FOOTER ══════════ */}
-      <footer className="bg-[#0a1525] border-t border-white/5 py-12">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid sm:grid-cols-3 gap-8">
-            <div>
-              <h3 className="font-display font-bold text-white text-lg">{BRAND.name}</h3>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed">Warm, experienced elder law guidance for families in Needham and Greater Boston.</p>
-            </div>
-            <div>
-              <h4 className="font-display font-semibold text-white text-sm mb-3">Practice Areas</h4>
-              <ul className="space-y-1.5">
-                {PRACTICE_AREAS.map((area) => <li key={area.name} className="text-slate-400 text-sm">{area.name}</li>)}
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-display font-semibold text-white text-sm mb-3">Contact</h4>
-              <ul className="space-y-1.5 text-sm text-slate-400">
-                <li><a href={`tel:${BRAND.phone}`} className="hover:text-amber-300 transition-colors">{BRAND.phone}</a></li>
-                <li className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {BRAND.area}</li>
-                <li>Free Initial Consultation</li>
-                <li>Attorney-Client Privilege</li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-10 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-            <span>© {new Date().getFullYear()} {BRAND.name}. All rights reserved. Powered by <a href="https://cogrow.ai" className="text-slate-400 hover:text-amber-300 transition-colors font-medium">CoGrow</a></span>
-            <div className="flex gap-4">
-              <span className="hover:text-slate-400 cursor-pointer transition-colors">Privacy</span>
-              <span className="hover:text-slate-400 cursor-pointer transition-colors">Terms</span>
-              <span className="hover:text-slate-400 cursor-pointer transition-colors">Attorney Advertising</span>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
