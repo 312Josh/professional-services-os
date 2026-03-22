@@ -42,7 +42,7 @@ const TRUST_ITEMS = [
 
 const SOLUTION_STEPS = [
   { icon: Zap, num: "01", title: "Free Consultation", body: "Start with a calm, confidential conversation about your family's situation, concerns, and goals." },
-  { icon: MessageSquare, num: "02", title: "Custom Plan", body: "If your team doesn't answer, the system sends a response within 60 seconds: \"Thank you for contacting Mitchell & Associates. An attorney will call you within 10 minutes.\" That text alone saves 40% of inquiries." },
+  { icon: MessageSquare, num: "02", title: "Custom Plan", body: "If your team doesn't answer, the system sends a response within 60 seconds: \"Thank you for contacting Heritage Elder Law Group. An attorney will call you within 10 minutes.\" That text alone saves 40% of inquiries." },
   { icon: CalendarCheck, num: "03", title: "Peace of Mind", body: "Move forward with a plan that protects loved ones, preserves assets where possible, and gives your family more confidence." },
   { icon: BarChart3, num: "04", title: "Local Support", body: "Work with a local team that understands the family, financial, and emotional realities behind elder law decisions." },
 ];
