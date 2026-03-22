@@ -1,25 +1,25 @@
 {
   "brand": {
-    "companyName": "Mitchell & Associates",
-    "tagline": "Trusted Legal Counsel.",
-    "appTitle": "Mitchell & Associates — Client Portal",
-    "appShortTitle": "Mitchell Law",
-    "phone": "(312) 555-0199",
-    "serviceArea": "Chicago, IL",
-    "yearsInBusiness": 18,
-    "accentColor": "#1e3a5f",
-    "accentColorMuted": "#2c4a6e",
-    "successColor": "#0c8d4f",
-    "dangerColor": "#b13a3a",
-    "surfaceTintColor": "#eef3f9",
+    "companyName": "Heritage Elder Law Group",
+    "tagline": "Protecting Families. Preserving Legacies.",
+    "appTitle": "Heritage Elder Law Group — Client Portal",
+    "appShortTitle": "Heritage Elder Law",
+    "phone": "(781) 444-8811",
+    "serviceArea": "Needham, MA & Greater Boston",
+    "yearsInBusiness": 15,
+    "accentColor": "#1b2a41",
+    "accentColorMuted": "#2e415d",
+    "successColor": "#587a5a",
+    "dangerColor": "#9c4a3c",
+    "surfaceTintColor": "#f5efe5",
     "logoUrl": ""
   },
   "vocabulary": {
     "lead": "Inquiry",
     "leads": "Inquiries",
     "service_request": "Consultation Request",
-    "job": "Engagement",
-    "jobs": "Engagements",
+    "job": "Matter",
+    "jobs": "Matters",
     "technician": "Attorney",
     "service_call": "Consultation",
     "service_area": "Practice Area",
@@ -29,59 +29,59 @@
     "customer": "Client",
     "customers": "Clients",
     "book": "Schedule",
-    "booking": "Appointment"
+    "booking": "Consultation"
   },
   "services": [
-    "Family Law",
-    "Estate Planning",
-    "Business Law",
-    "Personal Injury",
-    "Real Estate",
-    "Criminal Defense"
+    "Elder Law & Medicaid Planning",
+    "Estate Planning & Trusts",
+    "Probate & Estate Administration",
+    "Guardianship & Conservatorship",
+    "Long-Term Care Planning",
+    "Veterans Benefits"
   ],
   "trustBadges": [
-    { "label": "Bar Admitted", "icon": "⚖️" },
-    { "label": "AV Rated", "icon": "🏆" },
+    { "label": "NAELA Member", "icon": "⚖️" },
     { "label": "Super Lawyers", "icon": "⭐" },
-    { "label": "Board Certified", "icon": "🛡️" },
-    { "label": "Free Consultation", "icon": "💬" },
-    { "label": "Confidential", "icon": "🔒" }
+    { "label": "Bar Admitted", "icon": "🛡️" },
+    { "label": "Free Initial Consultation", "icon": "💬" },
+    { "label": "Confidential", "icon": "🔒" },
+    { "label": "5-Star Reviews", "icon": "🏆" }
   ],
   "reviews": [
     {
-      "name": "Maria S.",
+      "name": "Karen M.",
       "rating": 5,
-      "text": "I was going through a difficult divorce and needed an attorney fast. They responded within 10 minutes and made me feel heard from the first call.",
-      "date": "1 month ago",
-      "service": "Family Law"
-    },
-    {
-      "name": "James W.",
-      "rating": 5,
-      "text": "Set up our family trust and estate plan. Thorough, patient, and explained everything in plain English. Exactly what we needed.",
+      "text": "We were overwhelmed trying to help my mother qualify for long-term care. The team walked us through Medicaid planning with patience and clarity, and we finally felt like we had a plan.",
       "date": "3 weeks ago",
-      "service": "Estate Planning"
+      "service": "Medicaid Planning"
     },
     {
-      "name": "Linda C.",
+      "name": "Thomas & Ellen R.",
       "rating": 5,
-      "text": "Handled our business incorporation and operating agreement. Professional, responsive, and finished ahead of schedule.",
-      "date": "2 months ago",
-      "service": "Business Law"
-    },
-    {
-      "name": "Robert K.",
-      "rating": 5,
-      "text": "After my accident, I didn't know where to turn. They took my case on contingency and got me a settlement I never expected.",
+      "text": "We put off our estate plan for years. Heritage Elder Law Group made the process calm, organized, and far easier than we expected. We left with real peace of mind.",
       "date": "1 month ago",
-      "service": "Personal Injury"
+      "service": "Estate Planning & Trusts"
     },
     {
-      "name": "Angela T.",
-      "rating": 4,
-      "text": "Closed on our first home with zero stress. They caught issues the seller's attorney missed. Worth every penny.",
+      "name": "Melissa D.",
+      "rating": 5,
+      "text": "After my father passed away, probate felt impossible to navigate alone. They explained each step, kept us informed, and handled everything with compassion.",
+      "date": "2 months ago",
+      "service": "Probate & Estate Administration"
+    },
+    {
+      "name": "George P.",
+      "rating": 5,
+      "text": "We needed guardianship for an aging parent and did not know where to begin. They were steady, responsive, and thoughtful through the entire process.",
       "date": "6 weeks ago",
-      "service": "Real Estate"
+      "service": "Guardianship & Conservatorship"
+    },
+    {
+      "name": "William H.",
+      "rating": 5,
+      "text": "As a veteran, I was not sure what benefits my family could access. They helped us understand the options and put a plan in place that actually made a difference.",
+      "date": "5 weeks ago",
+      "service": "Veterans Benefits"
     }
   ],
   "operations": {
@@ -91,28 +91,28 @@
   },
   "faq": [
     {
-      "question": "How quickly will I hear back after contacting your firm?",
-      "answer": "We respond to all consultation requests within 10 minutes during business hours. After hours, you'll receive an automatic confirmation and a callback first thing the next morning."
+      "question": "What is elder law?",
+      "answer": "Elder law focuses on the legal and financial issues that affect older adults and their families, including estate planning, long-term care planning, Medicaid, probate, guardianship, and veterans benefits."
     },
     {
-      "question": "Do you offer free consultations?",
-      "answer": "Yes. Your initial consultation is free with no obligation. We'll listen to your situation, explain your options, and give you an honest assessment of your case."
+      "question": "When should I start planning?",
+      "answer": "Earlier is better. Planning before a health crisis gives your family more options, less stress, and more time to make thoughtful decisions."
     },
     {
-      "question": "What practice areas do you cover?",
-      "answer": "Our firm focuses on family law, estate planning, business law, personal injury, real estate, and criminal defense. We serve clients throughout the Chicago metropolitan area."
+      "question": "How does Medicaid planning work?",
+      "answer": "Medicaid planning looks at assets, income, care needs, and timing to help families protect what they can while preparing for long-term care costs within the rules."
     },
     {
-      "question": "How are your fees structured?",
-      "answer": "Fee structures vary by practice area. Personal injury cases are handled on contingency (no fee unless we win). Other matters use flat fees or hourly billing, always disclosed upfront before engagement."
+      "question": "What's the difference between a will and a trust?",
+      "answer": "A will says how assets should be handled after death, while a trust can manage assets during life and after death, often with more control, privacy, and probate avoidance."
     },
     {
-      "question": "Is my consultation confidential?",
-      "answer": "Absolutely. All communications with our firm are protected by attorney-client privilege from the moment you contact us."
+      "question": "How much does a consultation cost?",
+      "answer": "We offer a free initial consultation so families can understand their options and decide on the right next step before making a commitment."
     },
     {
-      "question": "Can I schedule a consultation online?",
-      "answer": "Yes. You can book a consultation directly from our website 24/7. Choose a time that works for you and receive instant confirmation."
+      "question": "Can you help with VA benefits?",
+      "answer": "Yes. We help eligible veterans and families understand benefits planning and how it may fit into a broader long-term care strategy."
     }
   ],
   "sticky": {
@@ -123,30 +123,30 @@
     "showCompetitorComparison": true,
     "showWeeklyDigest": true,
     "showReviewToast": true,
-    "industryAvgResponseHours": 72,
+    "industryAvgResponseHours": 48,
     "missedLeadThresholdMinutes": 120
   },
   "copy": {
     "dashboardTitle": "Firm Dashboard",
-    "dashboardSubtitle": "Inquiries, engagements, and billing at a glance.",
+    "dashboardSubtitle": "Inquiries, consultations, and follow-up at a glance.",
     "dashboardLeadAlertTitle": "New inquiry urgency",
-    "dashboardLeadAlertSubtitle": "Respond to build client trust.",
-    "loginSubtitle": "Attorney portal for your firm.",
+    "dashboardLeadAlertSubtitle": "Respond quickly and build family trust.",
+    "loginSubtitle": "Client portal for Heritage Elder Law Group.",
     "invoicePaymentModeLabel": "Payment terms:"
   },
   "payments": {
     "defaultEnabledMethodsCsv": "stripe,paypal",
     "defaultPrimaryMethod": "stripe",
     "destinationDefaults": {
-      "zelleRecipient": "billing@mitchelllaw.com",
-      "venmoHandle": "mitchelllaw",
-      "paypalHandle": "mitchelllaw",
+      "zelleRecipient": "info@heritageelderlawgroup.com",
+      "venmoHandle": "heritageelderlawgroup",
+      "paypalHandle": "heritageelderlawgroup",
       "fallbackBaseUrl": "https://professional-services-os.vercel.app"
     }
   },
   "demo": {
-    "loginEmail": "partner@mitchelllaw.com",
+    "loginEmail": "info@heritageelderlawgroup.com",
     "loginPassword": "admin123",
-    "loginHint": "Demo: partner@mitchelllaw.com / admin123"
+    "loginHint": ""
   }
 }

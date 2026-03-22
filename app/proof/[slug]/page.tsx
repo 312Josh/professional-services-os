@@ -181,7 +181,7 @@ export default async function ProofPage({ params }: { params: { slug: string } }
       {rep.name && (
         <div style={{ textAlign: "center", padding: "1.5rem", background: "#f0f9ff", borderTop: "1px solid #bae6fd" }}>
           <p style={{ margin: 0, fontSize: "0.875rem", color: "#0369a1" }}>
-            🤝 This demo was prepared by <strong>{rep.name}</strong> to show what a modern online presence looks like for {brand.companyName}.
+            <strong>{brand.companyName}</strong> preview
           </p>
           {rep.bookingLink && (
             <a href={rep.bookingLink} style={{ display: "inline-block", marginTop: "0.5rem", fontSize: "0.875rem", color: "#0369a1", fontWeight: 600 }}>

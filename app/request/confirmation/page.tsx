@@ -5,7 +5,7 @@ import { CheckCircle2, Phone, Clock, MessageSquare, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-const BRAND = { name: "Mitchell & Associates", phone: "(312) 555-0199", responseMin: 10 };
+const BRAND = { name: "Heritage Elder Law Group", phone: "(781) 444-8811", responseMin: 10 };
 
 export default function ConfirmationPage() {
   return (

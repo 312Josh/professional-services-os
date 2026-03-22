@@ -5,8 +5,8 @@ import { Phone, Clock, Shield, Scale, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-const BRAND = { name: "Mitchell & Associates", phone: "(312) 555-0199", responseMin: 10 };
-const AREAS = ["Family Law", "Estate Planning", "Business Law", "Personal Injury", "Real Estate", "Criminal Defense", "Other"];
+const BRAND = { name: "Heritage Elder Law Group", phone: "(781) 444-8811", responseMin: 10 };
+const AREAS = ["Elder Law & Medicaid Planning", "Estate Planning & Trusts", "Probate & Estate Administration", "Guardianship & Conservatorship", "Long-Term Care Planning", "Veterans Benefits", "Other"];
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.4 } }) } as const;
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } } as const;
@@ -66,7 +66,7 @@ export default function RequestPage() {
                 </form>
                 <div className="mt-6 pt-5 border-t border-slate-100 flex flex-wrap justify-center gap-4 text-xs text-slate-400">
                   <span className="flex items-center gap-1"><Scale className="w-3.5 h-3.5" /> Bar Admitted</span>
-                  <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> AV Rated</span>
+                  <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> NAELA Member</span>
                   <span className="flex items-center gap-1"><Lock className="w-3.5 h-3.5" /> Confidential</span>
                 </div>
               </CardContent>
